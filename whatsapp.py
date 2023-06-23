@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
+from fuzzywuzzy import fuzz
 from muscle_details import find_muscle_group, BACKS, BICEPS, CHESTS, TRICEPS, LEGS, SHOULDERS
 
 def connect_whatsapp():
@@ -58,7 +59,7 @@ def intro_sess(driver):
     send_message(driver, "What muscle?")
     time.sleep(2)
     send_message(driver, f"Here are some examples\nBack\n{BACKS}\nChest\n{CHESTS}\nLegs\n{LEGS}\nShoulders\n{SHOULDERS}\nBiceps\n{BICEPS}\nTricps\n{TRICEPS}")
-    time.sleep(10)
+    time.sleep(15)
     WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
 
 def last_message(driver):
@@ -73,13 +74,8 @@ def last_message(driver):
         last_message_text = last_message_element.text
         last_message = last_message_text.strip().split("\n")
         last_message = last_message[0]
-        print(f"reading lastmessage as_{last_message}_")
-        print(f"sdfsdf_{TRICEPS}__")
-        if last_message == TRICEPS:
-            print("triggered")
+        if last_message == str(TRICEPS):
             last_message = "What muscle?"
-        if last_message is TRICEPS:
-            print("triggered 2 ")
     return last_message
 
 if __name__ == "__main__":
