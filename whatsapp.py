@@ -4,8 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
-from fuzzywuzzy import fuzz
-from muscle_details import find_muscle_group, BACKS, BICEPS, CHESTS, TRICEPS, LEGS, SHOULDERS
+from muscle_details import TRICEPS
+from whatsapp_options import record_sess
 
 def connect_whatsapp():
     driver = webdriver.Chrome()
@@ -24,14 +24,13 @@ def connect_whatsapp():
     return driver
 
 def send_message(driver, message):
-
     inp_xpath = '//p[@class, "selectable-text copyable-text"][@contenteditable="true"][@data-tab="1"]'
     input_box = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true'][data-tab='10']")
     time.sleep(2)
     input_box.send_keys(message + Keys.ENTER)
 
 def start_sess(driver):
-    print("riunning")
+    print("running")
     time.sleep(5)
     # message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
     message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
@@ -45,28 +44,12 @@ def start_sess(driver):
     if message == "sess" or message == "Sess":
         record_sess(driver)
         # print(message_text)
-
-def record_sess(driver):
-    print("running sess")
-    intro_sess(driver)
-    muscle = last_message(driver)
-    print(f"they said {muscle}")
-    formated_muscle = find_muscle_group(muscle)
-    message = f"I'll look up your exercises for {formated_muscle}__"
-    send_message(driver, message)
-
-def intro_sess(driver):
-    send_message(driver, "What muscle?")
-    time.sleep(2)
-    send_message(driver, f"Here are some examples\nBack\n{BACKS}\nChest\n{CHESTS}\nLegs\n{LEGS}\nShoulders\n{SHOULDERS}\nBiceps\n{BICEPS}\nTricps\n{TRICEPS}")
-    time.sleep(15)
-    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
-
+    
 def last_message(driver):
     print("read last")
-    last_message = "What muscle?"
+    last_message = "Do you want to..."
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
-    while last_message == "What muscle?":
+    while last_message == "Do you want to...":
         message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
 
         last_message_element = message_elements[-1]
@@ -74,13 +57,15 @@ def last_message(driver):
         last_message_text = last_message_element.text
         last_message = last_message_text.strip().split("\n")
         last_message = last_message[0]
-        if last_message == str(TRICEPS):
+        if last_message == f"Tricps: {', '.join(TRICEPS)}":
             last_message = "What muscle?"
     return last_message
+
+def wait_refresh(driver):
+    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
 
 if __name__ == "__main__":
     driver = connect_whatsapp()
     send_message(driver, "Started your tracker")
     while True:
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
         start_sess(driver)

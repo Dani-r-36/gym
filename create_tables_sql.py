@@ -31,7 +31,7 @@ create table if not exists current_lift(
 create table if not exists exercise_details(
 	exercise_details_id INT generated always as identity,
 	exercise_id INT not null,
-	current_id INT not null,
+	current_id INT,
 	intensity VARCHAR(20) not null,
 	tips VARCHAR(200) not null,
 	optimum_level VARCHAR(20) not null,
