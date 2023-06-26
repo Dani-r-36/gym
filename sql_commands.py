@@ -19,3 +19,6 @@ def sql_insert_data(sql,params):
     curs.execute(sql, params)
     conn.commit()
     curs.close()
+
+
+    

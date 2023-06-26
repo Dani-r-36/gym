@@ -4,8 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
-from muscle_details import TRICEPS
-from whatsapp_options import record_sess
+from muscle_details import MUSCLES
 
 def connect_whatsapp():
     driver = webdriver.Chrome()
@@ -28,22 +27,6 @@ def send_message(driver, message):
     input_box = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true'][data-tab='10']")
     time.sleep(2)
     input_box.send_keys(message + Keys.ENTER)
-
-def start_sess(driver):
-    print("running")
-    time.sleep(5)
-    # message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
-    message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
-    time.sleep(5)
-    last_message_element = message_elements[-1]
-    # Extract the text content of each message
-    message_text = last_message_element.text
-    message = message_text.strip().split("\n")
-    message = message[0]
-    print (message)
-    if message == "sess" or message == "Sess":
-        record_sess(driver)
-        # print(message_text)
     
 def last_message(driver):
     print("read last")
@@ -57,12 +40,27 @@ def last_message(driver):
         last_message_text = last_message_element.text
         last_message = last_message_text.strip().split("\n")
         last_message = last_message[0]
-        if last_message == f"Tricps: {', '.join(TRICEPS)}":
+        if last_message == "Insert new exercise":
             last_message = "What muscle?"
     return last_message
 
-def wait_refresh(driver):
-    WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
+def wait_refresh(driver, last_message_text):
+    print("starting refresh")
+    last_message_locator = (By.CSS_SELECTOR, "div.message-out span.selectable-text")
+    last_message = WebDriverWait(driver, 20).until(EC.presence_of_element_located(last_message_locator))
+
+    # Retrieve the message text from the last message
+    message_text = last_message.get_attribute("innerText").strip()  
+    print(f"refresh read {message_text}")
+    print("finished refresh")
+    # WebDriverWait(driver, 30).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "div.message-out"), last_message_text))
+    # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
+
+def send_and_wait(driver, message):
+    send_message(driver, message)
+    wait_refresh(driver, message)
+    returned_message = last_message(driver)
+    return returned_message
 
 if __name__ == "__main__":
     driver = connect_whatsapp()
