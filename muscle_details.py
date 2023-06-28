@@ -2,16 +2,18 @@
 from fuzzywuzzy import fuzz
 from itertools import zip_longest
 from muscle_machine_names import MACHINES, MUSCLES, EXERCISE_NAME
-from whatsapp import send_and_wait
+from whatsapp import send_and_wait, send_message
 
 
 def send_and_receive_exercise_details(driver):
     message = "Please now answer all the questions in regards to the exercise"
-    temp = send_and_wait(driver, message, message)
+    send_message(driver, message)
     message = """What is the name of this exercise?"""
     exercise_name = send_and_wait(driver, message, message)
     message = """Please enter the machine/equipment required\nSuch as Lat pull down, Barbell, Seated parallel row machine, Dumbbells\n
     If multiple equipment is needed, please separate equipment with 'and'"""
+    # the and split it 
+    #split it 
     machine = send_and_wait(driver, message, "If multiple equipment is needed, please separate equipment with 'and'")
     message = "What is the intensity of the exercise?\n1 being not intense and 3 being very intense"
     intensity = send_and_wait(driver, message, "1 being not intense and 3 being very intense")
@@ -73,3 +75,14 @@ def redefined_variables(driver, similar_list, item_type):
     If none match, please re-enter your {item_type}\n{', '.join(similar_list)}"""
     updated_item = send_and_wait(driver, message, f"{', '.join(similar_list)}")
     return updated_item
+
+def current_lift(driver, exercise_name):
+    message = f"Please now answer all the questions in regards to your lift for {exercise_name}"
+    send_message(driver, message)
+    message = """What is the max weight your achieved? in kg"""
+    weight = send_and_wait(driver, message, message)
+    send_message(driver, "Wooow 💪")
+    message = """What is the max reps your achieved? just enter the number"""
+    reps = send_and_wait(driver, message, message)
+    send_message(driver, "gainsss 🏋️‍♂️")
+    return weight, reps
