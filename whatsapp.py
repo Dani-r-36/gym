@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
-from muscle_details import MUSCLES
 
 def connect_whatsapp():
     driver = webdriver.Chrome()
@@ -46,20 +45,23 @@ def last_message(driver):
 
 def wait_refresh(driver, last_message_text):
     print("starting refresh")
-    last_message_locator = (By.CSS_SELECTOR, "div.message-out span.selectable-text")
-    last_message = WebDriverWait(driver, 20).until(EC.presence_of_element_located(last_message_locator))
-
-    # Retrieve the message text from the last message
-    message_text = last_message.get_attribute("innerText").strip()  
-    print(f"refresh read {message_text}")
+    # locator = (By.ID, 'main')
+    print(f"refresh sees last message as {last_message_text}")
+    while True:
+        divs = driver.find_elements(By.CSS_SELECTOR, "div[data-testid='msg-container']")
+        last_message = divs[-1].text
+        last_message = last_message.strip().split("\n")
+        last_message = last_message[0]
+        if last_message != last_message_text:
+            break
     print("finished refresh")
-    # WebDriverWait(driver, 30).until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "div.message-out"), last_message_text))
-    # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
+    return last_message
 
-def send_and_wait(driver, message):
+def send_and_wait(driver, message, last_message_sent):
     send_message(driver, message)
-    wait_refresh(driver, message)
-    returned_message = last_message(driver)
+    time.sleep(5)
+    returned_message = wait_refresh(driver, last_message_sent)
+    # returned_message = last_message(driver)
     return returned_message
 
 if __name__ == "__main__":

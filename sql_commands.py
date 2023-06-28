@@ -20,5 +20,6 @@ def sql_insert_data(sql,params):
     conn.commit()
     curs.close()
 
-
-    
+def error_message(message,num):
+    """handles all error messages"""
+    return {"error": True, "Message": message, "Status_code":num}

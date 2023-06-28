@@ -1,2 +1,4 @@
 selenium
 fuzzywuzzy
+psycopg2
+python-dotenv
