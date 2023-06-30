@@ -2,27 +2,27 @@
 from fuzzywuzzy import fuzz
 from itertools import zip_longest
 from muscle_machine_names import MACHINES, MUSCLES, EXERCISE_NAME
-from whatsapp import send_and_wait, send_message
+from whatsapp import send_and_wait, send_message, driver
 
 
-def send_and_receive_exercise_details(driver):
+def send_and_receive_exercise_details():
     message = "Please now answer all the questions in regards to the exercise"
-    send_message(driver, message)
+    send_message(message)
     message = """What is the name of this exercise?"""
-    exercise_name = send_and_wait(driver, message, message)
+    exercise_name = send_and_wait(message, message)
     message = """Please enter the machine/equipment required\nSuch as Lat pull down, Barbell, Seated parallel row machine, Dumbbells\n
     If multiple equipment is needed, please separate equipment with 'and'"""
     # the and split it 
     #split it 
-    machine = send_and_wait(driver, message, "If multiple equipment is needed, please separate equipment with 'and'")
+    machine = send_and_wait(message, "If multiple equipment is needed, please separate equipment with 'and'")
     message = "What is the intensity of the exercise?\n1 being not intense and 3 being very intense"
-    intensity = send_and_wait(driver, message, "1 being not intense and 3 being very intense")
+    intensity = send_and_wait(message, "1 being not intense and 3 being very intense")
     message = "What is the optimum level of the exercise?\n1 being not optimum and 3 being very optimum"
-    optimum = send_and_wait(driver, message, "1 being not optimum and 3 being very optimum")
+    optimum = send_and_wait(message, "1 being not optimum and 3 being very optimum")
     message = "What are some tips for the exercise?"
-    tips = send_and_wait(driver, message, message)
-    message = "Please enter a link to a picture of video for the exercise"
-    link = send_and_wait(driver, message, message)
+    tips = send_and_wait(message, message)
+    message = "Please enter a link to a picture or video for the exercise"
+    link = send_and_wait(message, message)
     return machine, intensity, optimum, tips, link, exercise_name
 
 def find_muscle_group(muscle_to_check): 
@@ -47,7 +47,7 @@ def check_exercise_details(machine, intensity, optimum, tips, link, formated_mus
         print(err)
         return False
     
-def format_machine_exercise(driver, inputted_machine, inputted_exercise):
+def format_machine_exercise(inputted_machine, inputted_exercise):
     similar_machine = []
     similar_exercise = []
     updated_machine = ""
@@ -62,27 +62,29 @@ def format_machine_exercise(driver, inputted_machine, inputted_exercise):
             if fuzz.partial_ratio(name, inputted_exercise) > 65:
                 similar_exercise.append(name)
             if fuzz.partial_ratio(name, inputted_exercise) > 90:
-                updated_exercise = machine
+                updated_exercise = name
 
     if updated_machine == "":
-        updated_machine = redefined_variables(driver, similar_machine, "machine")
+        updated_machine = redefined_variables(similar_machine, "machine")
     if updated_exercise == "":
-        updated_exercise = redefined_variables(driver, similar_exercise, "exercise")
+        updated_exercise = redefined_variables(similar_exercise, "exercise")
+    print(updated_machine)
+    print(updated_exercise)
     return updated_machine, updated_exercise
 
-def redefined_variables(driver, similar_list, item_type):
+def redefined_variables(similar_list, item_type):
     message = f"""From the list of {item_type}, please send the closest {item_type} to the one you mentioned.\n
     If none match, please re-enter your {item_type}\n{', '.join(similar_list)}"""
-    updated_item = send_and_wait(driver, message, f"{', '.join(similar_list)}")
+    updated_item = send_and_wait(message, f"{', '.join(similar_list)}")
     return updated_item
 
-def current_lift(driver, exercise_name):
+def current_lift(exercise_name):
     message = f"Please now answer all the questions in regards to your lift for {exercise_name}"
-    send_message(driver, message)
-    message = """What is the max weight your achieved? in kg"""
-    weight = send_and_wait(driver, message, message)
-    send_message(driver, "Wooow 💪")
+    send_message(message)
+    message = """What is the max weight you achieved? in kg"""
+    weight = send_and_wait(message, message)
+    send_message("Wooow (muscle emoji here but can't insert them")
     message = """What is the max reps your achieved? just enter the number"""
-    reps = send_and_wait(driver, message, message)
-    send_message(driver, "gainsss 🏋️‍♂️")
+    reps = send_and_wait(message, message)
+    send_message("gainsss")
     return weight, reps

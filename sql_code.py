@@ -70,7 +70,8 @@ WHERE max_working_weight = %s
 """
 
 INSERT_EXERCISE_CURRENT_SQL = """
-INSERT INTO exercise_details (exercise_id, current_id, intensity, tips, optimum_level, picture_video_link)
+WITH ins AS (
+    INSERT INTO exercise_details (machine_id, current_id, intensity, tips, optimum_level, picture_video_link)
     VALUES (%s,%s,%s,%s,%s,%s)
     ON CONFLICT DO NOTHING
     RETURNING exercise_details_id
@@ -78,7 +79,7 @@ INSERT INTO exercise_details (exercise_id, current_id, intensity, tips, optimum_
 SELECT exercise_details_id FROM ins
 UNION ALL
 SELECT exercise_details_id FROM exercise_details
-WHERE exercise_id = %s
+WHERE machine_id = %s
     AND current_id = %s
     AND intensity = %s
     AND tips = %s

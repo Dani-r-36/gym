@@ -1,6 +1,7 @@
 import psycopg2
 import psycopg2.extras 
 from dotenv import dotenv_values
+from whatsapp import driver
 from sql_code import INSERT_EXERCISE_SQL, INSERT_MUSCLE_GROUP, INSERT_MUSCLE, INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT
 from muscle_details import current_lift
 
@@ -15,7 +16,7 @@ def get_db_connection():
 
 conn = get_db_connection()
 
-def insert_new_exercise(driver, machine, intensity, optimum, tips, link, formated_muscle, muscle_group, exercise_name, user_request):
+def insert_new_exercise(machine, intensity, optimum, tips, link, formated_muscle, muscle_group, exercise_name, user_request):
     try:
         # conn = get_db_connection()
         # curs = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
@@ -25,19 +26,20 @@ def insert_new_exercise(driver, machine, intensity, optimum, tips, link, formate
         # print(data)
         params = (muscle_group, muscle_group,)
         group_id = sql_execute_fetch_one(INSERT_MUSCLE_GROUP, params, "group_id")
+        # wait=input("check")
         params = (formated_muscle, group_id, formated_muscle, group_id,)
         muscle_id = sql_execute_fetch_one(INSERT_MUSCLE, params, "muscle_id")
         params = (machine, muscle_id, machine, muscle_id,)
-        exercise_id = sql_execute_fetch_one(INSERT_MACHINE, params, "exercise_id")
-        params = (exercise_id, intensity, tips, optimum, link,exercise_id, intensity, tips, optimum, link)
+        machine_id = sql_execute_fetch_one(INSERT_MACHINE, params, "machine_id")
+        params = (machine_id, intensity, tips, optimum, link,machine_id, intensity, tips, optimum, link)
         if user_request == "Yes" or user_request == "yes":
-            weight, reps = current_lift(driver, exercise_name)
+            weight, reps = current_lift(exercise_name)
             params = (weight, reps, weight, reps)
             current_id = sql_execute_fetch_one(INSERT_CURRENT, params, "current_id")
-            params = (exercise_id, current_id, intensity, tips, optimum, link,exercise_id, current_id, intensity, tips, optimum, link)
+            params = (machine_id, current_id, intensity, tips, optimum, link,machine_id, current_id, intensity, tips, optimum, link)
             exercise_details_id = sql_execute_fetch_one(INSERT_EXERCISE_CURRENT_SQL, params, "exercise_details_id")
         else:
-            params = (exercise_id, intensity, tips, optimum, link,exercise_id, intensity, tips, optimum, link)
+            params = (machine_id, intensity, tips, optimum, link,machine_id, intensity, tips, optimum, link)
             exercise_details_id = sql_execute_fetch_one(INSERT_EXERCISE_SQL, params, "exercise_details_id")
     except Exception as err:
         print (err)
@@ -49,6 +51,7 @@ def sql_execute_fetch_one(sql,params,id):
     curs = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
     curs.execute(sql, params)
     data = curs.fetchone()[id]
+    conn.commit()
     curs.close()
     return data
 
