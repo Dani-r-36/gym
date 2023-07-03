@@ -3,31 +3,37 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import WebDriverException
+import urllib.error
 import time
+WHATSAPP_URL = 'https://web.whatsapp.com/'
 
 def connect_whatsapp():
-    driver = webdriver.Chrome()
-    driver.get('https://web.whatsapp.com/')
-    # WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-in")))
-    time.sleep(20)
-    # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-ref]")))
-    # time.sleep(15)
-    contact_name = "Gym"
-    search_box = driver.find_element(By.XPATH, '//*[contains(@class, "selectable-text copyable-text")]')
-    search_box.send_keys(contact_name)
-    time.sleep(2)  # Wait for search results to load
-    chat = driver.find_element(By.XPATH, f"//span[@title='{contact_name}']")
-    chat.click()
-    time.sleep(2)
-    return driver
-
+    try:
+        driver = webdriver.Chrome()
+        driver.get(WHATSAPP_URL)
+        time.sleep(20)
+        contact_name = "Gym"
+        search_box = driver.find_element(By.XPATH, '//*[contains(@class, "selectable-text copyable-text")]')
+        search_box.send_keys(contact_name)
+        time.sleep(2)  # Wait for search results to load
+        chat = driver.find_element(By.XPATH, f"//span[@title='{contact_name}']")
+        chat.click()
+        time.sleep(2)
+        return driver
+    except WebDriverException as err:
+        print(err)
+        raise Exception("Invalid URL")
+    
 driver = connect_whatsapp()
 
 def send_message(message):
-    inp_xpath = '//p[@class, "selectable-text copyable-text"][@contenteditable="true"][@data-tab="1"]'
-    input_box = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true'][data-tab='10']")
-    time.sleep(2)
-    input_box.send_keys(message + Keys.ENTER)
+    try:
+        input_box = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true'][data-tab='10']")
+        time.sleep(2)
+        input_box.send_keys(message + Keys.ENTER)
+    except AttributeError:
+        raise Exception("Invalid object could be due to invalid URL")
     
 def last_message():
     print("read last")
@@ -47,27 +53,21 @@ def last_message():
 
 def wait_refresh(last_message_text):
     print("starting refresh")
-    # locator = (By.ID, 'main')
     print(f"refresh sees last message as {last_message_text}")
     break_line = "--------"
     send_message(break_line)
     while True:
         divs = driver.find_elements(By.CSS_SELECTOR, "div[data-testid='msg-container']")
-        last_message = divs[-1].text
-        last_message = last_message.strip().split("\n")
-        last_message = last_message[0]
-        if last_message != break_line:
+        last_message_ele = divs[-1].text
+        last_message_ele = last_message_ele.strip().split("\n")
+        last_message_ele = last_message_ele[0]
+        if last_message_ele != break_line:
             break
     print("finished refresh")
-    return last_message
+    return last_message_ele
 
 def send_and_wait(message, last_message_sent):
     send_message(message)
     returned_message = wait_refresh(last_message_sent)
     # returned_message = last_message(driver)
     return returned_message
-
-if __name__ == "__main__":
-    driver = connect_whatsapp()
-    send_message("Started your tracker")
-    start_sess()

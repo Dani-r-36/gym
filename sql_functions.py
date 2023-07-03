@@ -2,7 +2,7 @@ import psycopg2
 import psycopg2.extras 
 from dotenv import dotenv_values
 from whatsapp import driver
-from sql_code import INSERT_EXERCISE_SQL, INSERT_MUSCLE_GROUP, INSERT_MUSCLE, INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT
+from sql_code import INSERT_EXERCISE_SQL, INSERT_MUSCLE_GROUP, INSERT_MUSCLE, INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE
 from muscle_details import current_lift
 
 def get_db_connection():
@@ -16,30 +16,34 @@ def get_db_connection():
 
 conn = get_db_connection()
 
-def insert_new_exercise(machine, intensity, optimum, tips, link, formated_muscle, muscle_group, exercise_name, user_request):
+def insert_new_exercise(machine_list, intensity, optimum, tips, link, formated_muscle_list, muscle_group, exercise_name, user_request):
     try:
-        # conn = get_db_connection()
-        # curs = conn.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
-        # curs.execute("Select * from group_muscle;", "")
-        # data =curs.fetchall()
-        # curs.close()
-        # print(data)
+        i = 0
+        j = 0
+        muscle_id = []
+        exercise_id = []
+        machine_id = []
         params = (muscle_group, muscle_group,)
         group_id = sql_execute_fetch_one(INSERT_MUSCLE_GROUP, params, "group_id")
         # wait=input("check")
-        params = (formated_muscle, group_id, formated_muscle, group_id,)
-        muscle_id = sql_execute_fetch_one(INSERT_MUSCLE, params, "muscle_id")
-        params = (machine, muscle_id, machine, muscle_id,)
-        machine_id = sql_execute_fetch_one(INSERT_MACHINE, params, "machine_id")
+        for i in formated_muscle_list:
+            params = (formated_muscle_list[i], group_id, formated_muscle_list[i], group_id,)
+            muscle_id.append(sql_execute_fetch_one(INSERT_MUSCLE, params, "muscle_id"))
+        for id in muscle_id:
+            params = (exercise_name, id, exercise_name, id,)
+            exercise_id.append(sql_execute_fetch_one(INSERT_EXERCISE, params, "exercise_id"))
+        for machine_name in machine_list:
+            params = (machine_name, machine_name,)
+            machine_id.append(sql_execute_fetch_one(INSERT_MACHINE, params, "machine_id"))
         params = (machine_id, intensity, tips, optimum, link,machine_id, intensity, tips, optimum, link)
         if user_request == "Yes" or user_request == "yes":
             weight, reps = current_lift(exercise_name)
             params = (weight, reps, weight, reps)
             current_id = sql_execute_fetch_one(INSERT_CURRENT, params, "current_id")
-            params = (machine_id, current_id, intensity, tips, optimum, link,machine_id, current_id, intensity, tips, optimum, link)
+            params = (exercise_name, machine_id, current_id, intensity, tips, optimum, link,exercise_name, machine_id, current_id, intensity, tips, optimum, link)
             exercise_details_id = sql_execute_fetch_one(INSERT_EXERCISE_CURRENT_SQL, params, "exercise_details_id")
         else:
-            params = (machine_id, intensity, tips, optimum, link,machine_id, intensity, tips, optimum, link)
+            params = (exercise_name, machine_id, intensity, tips, optimum, link,exercise_name, machine_id, intensity, tips, optimum, link)
             exercise_details_id = sql_execute_fetch_one(INSERT_EXERCISE_SQL, params, "exercise_details_id")
     except Exception as err:
         print (err)

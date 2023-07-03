@@ -25,22 +25,35 @@ WHERE muscle_name = %s
     AND group_id = %s;
 """
 
+INSERT_EXERCISE = f"""
+WITH ins AS (
+    INSERT INTO exercise (exercise_name, muscle_id)
+    VALUES (%s,%s)
+    ON CONFLICT DO NOTHING
+    RETURNING exercise_id
+)
+SELECT exercise_id FROM ins
+UNION ALL
+SELECT exercise_id FROM exercise
+WHERE exercise_name = %s
+    AND muscle_id = %s;
+"""
+
 INSERT_MACHINE = f"""
 WITH ins AS (
-    INSERT INTO machine (exercise_machine, muscle_id)
-    VALUES (%s,%s)
+    INSERT INTO machine (machine_name)
+    VALUES (%s)
     ON CONFLICT DO NOTHING
     RETURNING machine_id
 )
 SELECT machine_id FROM ins
 UNION ALL
 SELECT machine_id FROM machine
-WHERE exercise_machine = %s
-    AND muscle_id = %s;
+WHERE machine_name = %s;
 """
 
 INSERT_EXERCISE_SQL=f"""
-INSERT INTO exercise_details (exercise_id, intensity, tips, optimum_level, picture_video_link)
+INSERT INTO exercise_details (exercise_name, machine_id, intensity, tips, optimum_level, picture_video_link)
     VALUES (%s,%s,%s,%s,%s)
     ON CONFLICT DO NOTHING
     RETURNING exercise_details_id
@@ -48,7 +61,8 @@ INSERT INTO exercise_details (exercise_id, intensity, tips, optimum_level, pictu
 SELECT exercise_details_id FROM ins
 UNION ALL
 SELECT exercise_details_id FROM exercise_details
-WHERE exercise_id = %s
+WHERE exercise_name = %s
+    AND machine_id = %s
     AND intensity = %s
     AND tips = %s
     AND optimum_level = %s
@@ -71,15 +85,16 @@ WHERE max_working_weight = %s
 
 INSERT_EXERCISE_CURRENT_SQL = """
 WITH ins AS (
-    INSERT INTO exercise_details (machine_id, current_id, intensity, tips, optimum_level, picture_video_link)
-    VALUES (%s,%s,%s,%s,%s,%s)
+    INSERT INTO exercise_details (exercise_name, machine_id, current_id, intensity, tips, optimum_level, picture_video_link)
+    VALUES (%s,%s,%s,%s,%s,%s,%s)
     ON CONFLICT DO NOTHING
     RETURNING exercise_details_id
 )
 SELECT exercise_details_id FROM ins
 UNION ALL
 SELECT exercise_details_id FROM exercise_details
-WHERE machine_id = %s
+WHERE exercise_name = %s
+    AND machine_id = %s
     AND current_id = %s
     AND intensity = %s
     AND tips = %s

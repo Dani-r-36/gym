@@ -15,6 +15,7 @@ def send_and_receive_exercise_details():
     # the and split it 
     #split it 
     machine = send_and_wait(message, "If multiple equipment is needed, please separate equipment with 'and'")
+    machine_list = split_machine(machine)
     message = "What is the intensity of the exercise?\n1 being not intense and 3 being very intense"
     intensity = send_and_wait(message, "1 being not intense and 3 being very intense")
     message = "What is the optimum level of the exercise?\n1 being not optimum and 3 being very optimum"
@@ -23,20 +24,32 @@ def send_and_receive_exercise_details():
     tips = send_and_wait(message, message)
     message = "Please enter a link to a picture or video for the exercise"
     link = send_and_wait(message, message)
-    return machine, intensity, optimum, tips, link, exercise_name
+    return machine_list, intensity, optimum, tips, link, exercise_name
+
+def split_machine(machine):
+    machine_list = machine.split("and")
+    stripped_machine= []
+    for item in machine_list:
+        stripped_machine.append(item.strip())
+    return stripped_machine
 
 def find_muscle_group(muscle_to_check): 
     for muscle, muscle_list in MUSCLES.items():
         for item in muscle_list:
             if fuzz.partial_ratio(muscle_to_check.lower(), item.lower()) >=85:
                 return item, muscle
+    send_and_wait(f"What muscle group does {muscle_to_check}")
 
 
-def check_exercise_details(machine, intensity, optimum, tips, link, formated_muscle, muscle_group, exercise_name):
+def check_exercise_details(machine_list, intensity, optimum, tips, link, formated_muscle, muscle_group, exercise_name):
     #check machine
-    if machine == None or machine == "" or tips == None or tips == "" or link == None or link == "" or exercise_name == None or exercise_name == "":
+    i = 0
+    for i in machine_list:
+        if machine_list[i] == None or machine_list[i] == "" :
+            return False
+    if tips == None or tips == "" or link == None or link == "" or exercise_name == None or exercise_name == "":
         print("here")
-        print(f"{machine}_{tips}_{link}_{exercise_name}")
+        print(f"{tips}_{link}_{exercise_name}")
         return False
     try:
         intensity = int(intensity)
@@ -47,16 +60,21 @@ def check_exercise_details(machine, intensity, optimum, tips, link, formated_mus
         print(err)
         return False
     
-def format_machine_exercise(inputted_machine, inputted_exercise):
+def format_machine_exercise(inputted_machine_list, inputted_exercise):
     similar_machine = []
     similar_exercise = []
+    updated_machine_list = []
     updated_machine = ""
     updated_exercise = ""
-    for machine in MACHINES:
-        if fuzz.partial_ratio(machine, inputted_machine) > 65:
-            similar_machine.append(machine)
-        if fuzz.partial_ratio(machine, inputted_machine) > 90:
-            updated_machine = machine
+    i = 0
+    for i in inputted_machine_list:
+        for machine in MACHINES:
+            if fuzz.partial_ratio(machine, inputted_machine_list[i]) > 65:
+                similar_machine.append(machine)
+            if fuzz.partial_ratio(machine, inputted_machine_list[i]) > 90:
+                updated_machine = machine
+        if updated_machine == "":
+            updated_machine_list.append(redefined_variables(similar_machine, "machine"))
     for exericse, exericse_list in EXERCISE_NAME.items():
         for name in exericse_list:
             if fuzz.partial_ratio(name, inputted_exercise) > 65:
@@ -64,13 +82,11 @@ def format_machine_exercise(inputted_machine, inputted_exercise):
             if fuzz.partial_ratio(name, inputted_exercise) > 90:
                 updated_exercise = name
 
-    if updated_machine == "":
-        updated_machine = redefined_variables(similar_machine, "machine")
     if updated_exercise == "":
         updated_exercise = redefined_variables(similar_exercise, "exercise")
-    print(updated_machine)
+    print(updated_machine_list)
     print(updated_exercise)
-    return updated_machine, updated_exercise
+    return updated_machine_list, updated_exercise
 
 def redefined_variables(similar_list, item_type):
     message = f"""From the list of {item_type}, please send the closest {item_type} to the one you mentioned.\n
