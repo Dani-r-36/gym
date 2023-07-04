@@ -73,7 +73,9 @@ def number_muscles():
         number_muscles()
     print(num)
     for i in range(int(num)):
-        print(f"running sub group call {i}")
+        muscle_num = i + 1
+        print(f"running sub group call {muscle_num}")
+        send_message(f"Enter muscle {muscle_num}")
         muscle = send_and_wait(WHICH_SUB, f"Tricps: {', '.join(MUSCLES['TRICEPS'])}")
         print(f"they said {muscle}")
         formated_muscle, muscle_group = find_muscle_group(muscle)

@@ -27,16 +27,21 @@ WHERE muscle_name = %s
 
 INSERT_EXERCISE = f"""
 WITH ins AS (
-    INSERT INTO exercise (exercise_name, muscle_id)
-    VALUES (%s,%s)
+    INSERT INTO exercise (exercise_name)
+    VALUES (%s)
     ON CONFLICT DO NOTHING
     RETURNING exercise_id
 )
 SELECT exercise_id FROM ins
 UNION ALL
 SELECT exercise_id FROM exercise
-WHERE exercise_name = %s
-    AND muscle_id = %s;
+WHERE exercise_name = %s;
+"""
+
+INSERT_EXERCISE_MUSCLE = f"""
+INSERT INTO exercise_muscle (exercise_id, muscle_id)
+VALUES (%s,%s)
+ON CONFLICT DO NOTHING;
 """
 
 INSERT_MACHINE = f"""
@@ -51,9 +56,14 @@ UNION ALL
 SELECT machine_id FROM machine
 WHERE machine_name = %s;
 """
+INSERT_EXERCISE_MACHINE = f"""
+INSERT INTO exercise_machine (exercise_id, machine_id)
+VALUES (%s,%s)
+ON CONFLICT DO NOTHING;
+"""
 
 INSERT_EXERCISE_SQL=f"""
-INSERT INTO exercise_details (exercise_name, machine_id, intensity, tips, optimum_level, picture_video_link)
+INSERT INTO exercise_details (exercise_id, intensity, tips, optimum_level, picture_video_link)
     VALUES (%s,%s,%s,%s,%s)
     ON CONFLICT DO NOTHING
     RETURNING exercise_details_id
@@ -61,8 +71,7 @@ INSERT INTO exercise_details (exercise_name, machine_id, intensity, tips, optimu
 SELECT exercise_details_id FROM ins
 UNION ALL
 SELECT exercise_details_id FROM exercise_details
-WHERE exercise_name = %s
-    AND machine_id = %s
+WHERE exercise_id = %s
     AND intensity = %s
     AND tips = %s
     AND optimum_level = %s
@@ -85,16 +94,15 @@ WHERE max_working_weight = %s
 
 INSERT_EXERCISE_CURRENT_SQL = """
 WITH ins AS (
-    INSERT INTO exercise_details (exercise_name, machine_id, current_id, intensity, tips, optimum_level, picture_video_link)
-    VALUES (%s,%s,%s,%s,%s,%s,%s)
+    INSERT INTO exercise_details (exercise_id, current_id, intensity, tips, optimum_level, picture_video_link)
+    VALUES (%s,%s,%s,%s,%s,%s)
     ON CONFLICT DO NOTHING
     RETURNING exercise_details_id
 )
 SELECT exercise_details_id FROM ins
 UNION ALL
 SELECT exercise_details_id FROM exercise_details
-WHERE exercise_name = %s
-    AND machine_id = %s
+WHERE exercise_id = %s
     AND current_id = %s
     AND intensity = %s
     AND tips = %s

@@ -29,8 +29,10 @@ def send_and_receive_exercise_details():
 def split_machine(machine):
     machine_list = machine.split("and")
     stripped_machine= []
+    print(f"Inside split machine {machine_list}")
     for item in machine_list:
         stripped_machine.append(item.strip())
+    print(f"stripped machine {stripped_machine}")
     return stripped_machine
 
 def find_muscle_group(muscle_to_check): 
@@ -43,9 +45,8 @@ def find_muscle_group(muscle_to_check):
 
 def check_exercise_details(machine_list, intensity, optimum, tips, link, formated_muscle, muscle_group, exercise_name):
     #check machine
-    i = 0
-    for i in machine_list:
-        if machine_list[i] == None or machine_list[i] == "" :
+    for machine in machine_list:
+        if machine == None or machine == "" :
             return False
     if tips == None or tips == "" or link == None or link == "" or exercise_name == None or exercise_name == "":
         print("here")
@@ -66,20 +67,23 @@ def format_machine_exercise(inputted_machine_list, inputted_exercise):
     updated_machine_list = []
     updated_machine = ""
     updated_exercise = ""
-    i = 0
-    for i in inputted_machine_list:
+    for input_machine in inputted_machine_list:
         for machine in MACHINES:
-            if fuzz.partial_ratio(machine, inputted_machine_list[i]) > 65:
+            if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 65:
+                print(f"format, similar equipment found {machine}")
                 similar_machine.append(machine)
-            if fuzz.partial_ratio(machine, inputted_machine_list[i]) > 90:
+            if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 90:
+                print(f"format, equipment found {machine}")
                 updated_machine = machine
         if updated_machine == "":
+            print(f"found similar about to call redefined {similar_machine}")
             updated_machine_list.append(redefined_variables(similar_machine, "machine"))
+        similar_machine = []
     for exericse, exericse_list in EXERCISE_NAME.items():
         for name in exericse_list:
-            if fuzz.partial_ratio(name, inputted_exercise) > 65:
+            if fuzz.partial_ratio(name.lower(), inputted_exercise.lower()) > 65:
                 similar_exercise.append(name)
-            if fuzz.partial_ratio(name, inputted_exercise) > 90:
+            if fuzz.partial_ratio(name.lower(), inputted_exercise.lower()) > 90:
                 updated_exercise = name
 
     if updated_exercise == "":
