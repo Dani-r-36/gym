@@ -63,7 +63,8 @@ ON CONFLICT DO NOTHING;
 """
 
 INSERT_EXERCISE_SQL=f"""
-INSERT INTO exercise_details (exercise_id, intensity, tips, optimum_level, picture_video_link)
+WITH ins AS (
+    INSERT INTO exercise_details (exercise_id, intensity, tips, optimum_level, picture_video_link)
     VALUES (%s,%s,%s,%s,%s)
     ON CONFLICT DO NOTHING
     RETURNING exercise_details_id

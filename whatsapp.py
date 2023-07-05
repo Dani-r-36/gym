@@ -4,20 +4,21 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException
-import urllib.error
 import time
 WHATSAPP_URL = 'https://web.whatsapp.com/'
+TIME_LOAD_BROWSER = 10
+CONTACT_NAME = "Gym"
 
 def connect_whatsapp():
     try:
         driver = webdriver.Chrome()
         driver.get(WHATSAPP_URL)
-        time.sleep(20)
-        contact_name = "Gym"
+        time.sleep(TIME_LOAD_BROWSER)
+        wait_login(driver)
         search_box = driver.find_element(By.XPATH, '//*[contains(@class, "selectable-text copyable-text")]')
-        search_box.send_keys(contact_name)
+        search_box.send_keys(CONTACT_NAME)
         time.sleep(2)  # Wait for search results to load
-        chat = driver.find_element(By.XPATH, f"//span[@title='{contact_name}']")
+        chat = driver.find_element(By.XPATH, f"//span[@title='{CONTACT_NAME}']")
         chat.click()
         time.sleep(2)
         return driver
@@ -25,6 +26,18 @@ def connect_whatsapp():
         print(err)
         raise Exception("Invalid URL")
     
+def wait_login(driver):
+    element = "Use WhatsApp on your computer"
+    while element == "Use WhatsApp on your computer":
+        divs = driver.find_elements(By.CSS_SELECTOR, "div[class='landing-window']")
+        if len(divs) == 0:
+            break
+        element = divs[0].text
+        element = element.strip().split("\n")
+        element = element[0]
+        print(element)
+    time.sleep(TIME_LOAD_BROWSER)
+
 driver = connect_whatsapp()
 
 def send_message(message):

@@ -6,7 +6,7 @@ MUSCLES = {
     "CHESTS" : ["Upper chest", "Middle chest", "Lower chest"],
     "LEGS" : ["Quads", "Hamstrings", "Glutes", "Calfs", "Inner adductors", 'Outer adductors']
 }
-MACHINES = ["Cables", "Dumbbells", "bench", "squat rack", "Incline chest press machine", 
+MACHINES = ["Cables", "Dumbbells", "barbell", "bench", "squat rack", "Incline chest press machine", 
 "Smith machine", "chest supported free weight row machine", "Lat pull machine", "Parallel row machine", "pull-up dip station",
 "Pec fly machine", "Seated calf raise machine", "standing calf raise machine", "Leg press free weight", "Hack squat machine",
 "Leg press machine", "Prone leg curl machine", "Leg extension machine", "Machine preacher curl", "Inner adductor machine",

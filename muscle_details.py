@@ -69,34 +69,39 @@ def format_machine_exercise(inputted_machine_list, inputted_exercise):
     updated_exercise = ""
     for input_machine in inputted_machine_list:
         for machine in MACHINES:
+            print(f"comparing machine {machine} to {input_machine.lower()} got score {fuzz.partial_ratio(machine.lower(), input_machine.lower())}")
             if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 65:
                 print(f"format, similar equipment found {machine}")
                 similar_machine.append(machine)
             if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 90:
                 print(f"format, equipment found {machine}")
-                updated_machine = machine
+                updated_machine = machine.lower()
         if updated_machine == "":
             print(f"found similar about to call redefined {similar_machine}")
-            updated_machine_list.append(redefined_variables(similar_machine, "machine"))
+            updated_machine_list.append(redefined_variables(similar_machine, "machine", input_machine))
         similar_machine = []
     for exericse, exericse_list in EXERCISE_NAME.items():
         for name in exericse_list:
             if fuzz.partial_ratio(name.lower(), inputted_exercise.lower()) > 65:
                 similar_exercise.append(name)
             if fuzz.partial_ratio(name.lower(), inputted_exercise.lower()) > 90:
-                updated_exercise = name
+                updated_exercise = name.lower()
 
     if updated_exercise == "":
-        updated_exercise = redefined_variables(similar_exercise, "exercise")
+        updated_exercise = redefined_variables(similar_exercise, "exercise", inputted_exercise)
     print(updated_machine_list)
     print(updated_exercise)
     return updated_machine_list, updated_exercise
 
-def redefined_variables(similar_list, item_type):
-    message = f"""From the list of {item_type}, please send the closest {item_type} to the one you mentioned.\n
-    If none match, please re-enter your {item_type}\n{', '.join(similar_list)}"""
-    updated_item = send_and_wait(message, f"{', '.join(similar_list)}")
-    return updated_item
+def redefined_variables(similar_list, item_type, inputted):
+    if len(similar_list) == 0:
+        message = f"""Nothing matched in our list of {item_type}.\nPlease re-enter {item_type} with no typos, you entered {inputted}"""
+        updated_item = send_and_wait(message, f"Please re-enter {item_type} with no typos, you entered {inputted}")
+    else:
+        message = f"""From the list of {item_type}, please send the closest {item_type} to what you entered, {inputted}.
+        \n{', '.join(similar_list)}.\nIf none match, please re-enter your {item_type}"""
+        updated_item = send_and_wait(message, f"{', '.join(similar_list)}")
+    return updated_item.lower()
 
 def current_lift(exercise_name):
     message = f"Please now answer all the questions in regards to your lift for {exercise_name}"

@@ -13,7 +13,7 @@ MUSCLE_EXAMPLE = f"""
     """
 
 WHICH_SUB = f"""
-    Please enter which of the following sub-muscle group the exercise belongs to\n
+    The muscle sub groups are ->\n
     Back: {', '.join(MUSCLES['BACKS'])}\n
     Chest: {', '.join(MUSCLES['CHESTS'])}\nLegs: {', '.join(MUSCLES['LEGS'])}\n
     Shoulders: {', '.join(MUSCLES['SHOULDERS'])}\nBiceps: {', '.join(MUSCLES['BICEPS'])}\n
