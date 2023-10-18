@@ -69,19 +69,20 @@ def read_last_message():
     last_message = message_elements[-1].text.strip().split("\n")[0]
     return last_message
 
-def wait_refresh(last_message_text):
-    return_message = ""
+def wait_refresh():
+    break_line = "--------"
+    return_message = break_line
     print("starting refresh")
     message = read_last_message()
     print(f"refresh sees last message as {message}")
-    print("waiting to start sess")
-    while return_message != "Sess" and return_message != "sess":      
+    send_message(break_line)
+    print("waiting for user message")
+    while return_message == break_line:      
         return_message = read_last_message()
-        print(return_message)
     return return_message
 
-def send_and_wait(message, last_message_sent):
+def send_and_wait(message):
     send_message(message)
-    returned_message = wait_refresh(last_message_sent)
+    returned_message = wait_refresh()
     # returned_message = last_message(driver)
     return returned_message
