@@ -28,14 +28,16 @@ def connect_whatsapp():
     
 def wait_login(driver):
     element = "Use WhatsApp on your computer"
+    print(element)
     while element == "Use WhatsApp on your computer":
-        divs = driver.find_elements(By.CSS_SELECTOR, "div[class='landing-window']")
-        if len(divs) == 0:
-            break
-        element = divs[0].text
-        element = element.strip().split("\n")
-        element = element[0]
-        print(element)
+        try:
+            divs = driver.find_elements(By.CSS_SELECTOR, "div[class='landing-window']")
+            element = divs[0].text.strip().split("\n")[0]
+            if element != "Use WhatsApp on your computer":
+                break  # Exit the loop when the element changes
+        except:
+            print("Element not found or timed out, logging in...")
+            break  # Exit the loop on error or timeout
     time.sleep(TIME_LOAD_BROWSER)
 
 driver = connect_whatsapp()
@@ -45,6 +47,7 @@ def send_message(message):
         input_box = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true'][data-tab='10']")
         time.sleep(2)
         input_box.send_keys(message + Keys.ENTER)
+        print("sent: ", message)
     except AttributeError:
         raise Exception("Invalid object could be due to invalid URL")
     
@@ -54,30 +57,28 @@ def last_message():
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
     while last_message == "Do you want to...":
         message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
-
-        last_message_element = message_elements[-1]
         # Extract the text content of the last message
-        last_message_text = last_message_element.text
-        last_message = last_message_text.strip().split("\n")
-        last_message = last_message[0]
+        last_message = message_elements[-1].text.strip().split("\n")[0]
         if last_message == "Insert new exercise":
             last_message = "What muscle?"
     return last_message
 
+def read_last_message():
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
+    message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
+    last_message = message_elements[-1].text.strip().split("\n")[0]
+    return last_message
+
 def wait_refresh(last_message_text):
+    return_message = ""
     print("starting refresh")
-    print(f"refresh sees last message as {last_message_text}")
-    break_line = "--------"
-    send_message(break_line)
-    while True:
-        divs = driver.find_elements(By.CSS_SELECTOR, "div[data-testid='msg-container']")
-        last_message_ele = divs[-1].text
-        last_message_ele = last_message_ele.strip().split("\n")
-        last_message_ele = last_message_ele[0]
-        if last_message_ele != break_line:
-            break
-    print("finished refresh")
-    return last_message_ele
+    message = read_last_message()
+    print(f"refresh sees last message as {message}")
+    print("waiting to start sess")
+    while return_message != "Sess" and return_message != "sess":      
+        return_message = read_last_message()
+        print(return_message)
+    return return_message
 
 def send_and_wait(message, last_message_sent):
     send_message(message)

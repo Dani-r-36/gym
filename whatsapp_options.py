@@ -104,10 +104,10 @@ def get_new_exercise_details(muscle_list, muscle_group):
 
 if __name__ == "__main__":
     send_message("Started your tracker")
+    send_message("--------")
     return_message = wait_refresh("Started your tracker")
     print("out of it ")
     print(return_message)
-    if return_message == "Sess" or return_message == "sess":
-        print("caught message sess")
-        record_sess()
-        # start_sess(driver)
+    print("caught message sess")
+    record_sess()
+    # start_sess(driver)
