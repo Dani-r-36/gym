@@ -35,7 +35,7 @@ def record_sess():
 
 def intro_sess():
     send_message(INTRO)
-    returned_message = wait_refresh("End session?")
+    returned_message = wait_refresh()
     return returned_message
     
 def choice(user_choice):
@@ -68,15 +68,15 @@ def number_muscles():
     muscle_list = []
     message = "How many sub-muscle groups does the exercise cover?"
     send_message(WHICH_SUB)
-    num = send_and_wait(message, message)
+    num = send_and_wait(message)
     while num_integer(num) == False:
-        send_message("Enter an integer") 
-        num = send_and_wait(message, message)
+        send_message("Enter an integer for the number of sub-muscle groups covered") 
+        num = send_and_wait(message)
     print(f"they entered {num} of sub muscles")
     for i in range(int(num)):
         muscle_num = i + 1
         print(f"running sub group call {muscle_num}")
-        muscle = send_and_wait(f"Enter sub muscle {muscle_num}", f"Enter sub muscle {muscle_num}")
+        muscle = send_and_wait(f"Enter sub muscle {muscle_num}")
         print(f"they said {muscle}")
         formated_muscle, muscle_group = find_muscle_group(muscle)
         muscle_list.append(formated_muscle)
@@ -96,16 +96,26 @@ def get_new_exercise_details(muscle_list, muscle_group):
         get_new_exercise_details(muscle_list, muscle_group)
     #before running need to return all exercises to make sure not already there by checking table
     machine_list, exercise_name = format_machine_exercise(machine_list, exercise_name)
+    check_information = f"""
+    You entered\n
+    Exercise name :{exercise_name}, machine :{machine_list}, Intensity of exercise :{intensity}
+    optimum level :{optimum}, tips :{tips}, link :{link} \n Muscle list :{muscle_list}, Muscle group :{muscle_group}"""
+    send_message(check_information)
+    check = send_and_wait("Is this correct? Enter Y or N")
+    if check == "N" or check =="No":
+        get_new_exercise_details(muscle_list, muscle_group)
 
     message = """Would you also like to add your max weight and max reps for this exercise?
     \nEnter Yes if you would like to do so, and No if not"""
-    user_request = send_and_wait(message, "Enter Yes if you would like to do so, and No if not")
+    user_request = send_and_wait(message)
     return machine_list, intensity, optimum, tips, link, muscle_list, muscle_group, exercise_name, user_request
 
 if __name__ == "__main__":
+    return_message = ""
     send_message("Started your tracker")
-    send_message("--------")
-    return_message = wait_refresh("Started your tracker")
+    # send_message("--------")
+    while return_message != "sess" and return_message != "Sess":
+        return_message = wait_refresh()   
     print("out of it ")
     print(return_message)
     print("caught message sess")
