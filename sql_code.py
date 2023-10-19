@@ -110,3 +110,10 @@ WHERE exercise_id = %s
     AND optimum_level = %s
     AND picture_video_link = %s;
 """
+
+
+EXISTING_EXERCISE = """
+SELECT exercise_name
+FROM exercise
+WHERE similarity(exercise_name, %s) > 0.5;
+"""

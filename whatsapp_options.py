@@ -1,8 +1,9 @@
-from whatsapp import connect_whatsapp, send_message, wait_refresh, send_and_wait, driver
+from whatsapp import send_message, wait_refresh, send_and_wait
 from sql_functions import error_message, sql_insert_data, insert_new_exercise
-from muscle_details import find_muscle_group, check_exercise_details, format_machine_exercise, send_and_receive_exercise_details
-from muscle_machine_names import MUSCLES
-from whatsapp_messages import INTRO, MUSCLE_EXAMPLE, WHICH_SUB
+from exercise_details import number_muscles, get_new_exercise_details
+from sql_functions import existing_exercise
+from whatsapp_messages import INTRO
+
 import time
 from fuzzywuzzy import fuzz
 from selenium.webdriver.common.by import By
@@ -45,9 +46,11 @@ def choice(user_choice):
     #     find_current_list(driver)
     if fuzz.partial_ratio(user_choice, "Insert new exercise") > 70:
         muscle_list, muscle_group = number_muscles()
-        muscle_list, intensity, optimum, tips, link, muscle_list, muscle_group, exercise_name, user_request = get_new_exercise_details(muscle_list, muscle_group)
+        details, user_request = get_new_exercise_details(muscle_list, muscle_group)
+        if details == False:
+            return "Loop"
         print("about to call insert")
-        insert_new_exercise(muscle_list, intensity, optimum, tips, link, muscle_list, muscle_group, exercise_name, user_request)
+        insert_new_exercise(details, user_request)
     if fuzz.partial_ratio(user_choice, "End session") > 70:
         send_message("You look bigger than you think")
         return "End"
@@ -63,61 +66,15 @@ def choice(user_choice):
 #     send_message(message)
     #need to search for exercises but first need to insert them
 
-def number_muscles():
-    i = 0
-    muscle_list = []
-    message = "How many sub-muscle groups does the exercise cover?"
-    send_message(WHICH_SUB)
-    num = send_and_wait(message)
-    while num_integer(num) == False:
-        send_message("Enter an integer for the number of sub-muscle groups covered") 
-        num = send_and_wait(message)
-    print(f"they entered {num} of sub muscles")
-    for i in range(int(num)):
-        muscle_num = i + 1
-        print(f"running sub group call {muscle_num}")
-        muscle = send_and_wait(f"Enter sub muscle {muscle_num}")
-        print(f"they said {muscle}")
-        formated_muscle, muscle_group = find_muscle_group(muscle)
-        muscle_list.append(formated_muscle)
-
-    return muscle_list, muscle_group
-
-def num_integer(input):
-    return isinstance(input, int) or (isinstance(input, str) and input.isdigit())
-    
-def get_new_exercise_details(muscle_list, muscle_group):
-    machine_list, intensity, optimum, tips, link, exercise_name = send_and_receive_exercise_details()
-
-    print(f"machine is {machine_list}, intensity is {intensity}, optimum is {optimum}, tips: {tips}, link: {link}\n {muscle_list, muscle_group}")
-
-    if check_exercise_details(machine_list, intensity, optimum, tips, link, muscle_list, muscle_group, exercise_name) == False:
-        send_message("Incorrect information given, please enter details again")
-        get_new_exercise_details(muscle_list, muscle_group)
-    #before running need to return all exercises to make sure not already there by checking table
-    machine_list, exercise_name = format_machine_exercise(machine_list, exercise_name)
-    check_information = f"""
-    You entered\n
-    Exercise name :{exercise_name}, machine :{machine_list}, Intensity of exercise :{intensity}
-    optimum level :{optimum}, tips :{tips}, link :{link} \n Muscle list :{muscle_list}, Muscle group :{muscle_group}"""
-    send_message(check_information)
-    check = send_and_wait("Is this correct? Enter Y or N")
-    if check == "N" or check =="No":
-        get_new_exercise_details(muscle_list, muscle_group)
-
-    message = """Would you also like to add your max weight and max reps for this exercise?
-    \nEnter Yes if you would like to do so, and No if not"""
-    user_request = send_and_wait(message)
-    return machine_list, intensity, optimum, tips, link, muscle_list, muscle_group, exercise_name, user_request
 
 if __name__ == "__main__":
     return_message = ""
     send_message("Started your tracker")
-    # send_message("--------")
     while return_message != "sess" and return_message != "Sess":
         return_message = wait_refresh()   
     print("out of it ")
     print(return_message)
     print("caught message sess")
+    # check = existing_exercise("lat pulldown with some random shit")
     record_sess()
     # start_sess(driver)
