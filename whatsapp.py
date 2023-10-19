@@ -46,6 +46,8 @@ def send_message(message):
     try:
         input_box = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true'][data-tab='10']")
         time.sleep(2)
+        if message != "--------":
+            message = f"_{message}_"
         input_box.send_keys(message + Keys.ENTER)
         print("sent: ", message)
     except AttributeError:

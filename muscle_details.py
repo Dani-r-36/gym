@@ -2,7 +2,7 @@
 from fuzzywuzzy import fuzz
 from itertools import zip_longest
 from muscle_machine_names import MACHINES, MUSCLES, EXERCISE_NAME
-from whatsapp import send_and_wait, send_message, driver
+from whatsapp import send_and_wait, send_message
 from whatsapp_messages import WHICH_SUB
 
 
@@ -25,7 +25,8 @@ def send_and_receive_exercise_details():
     tips = send_and_wait(message)
     message = "Please enter a link to a picture or video for the exercise"
     link = send_and_wait(message)
-    return machine_list, intensity, optimum, tips, link, exercise_name
+    details = {"machine_list": machine_list,"intensity": intensity,"optimum": optimum,"tips": tips,"link": link,"exercise_name": exercise_name, "muscle_list":None,"muscle_group":None}
+    return details
 
 def split_machine(machine):
     machine_list = machine.split("and")
@@ -48,19 +49,19 @@ def find_muscle_group(muscle_to_check):
     return find_muscle_group(response)
 
 
-def check_exercise_details(machine_list, intensity, optimum, tips, link, formated_muscle, muscle_group, exercise_name):
+def check_exercise_details(details):
     #check machine
-    for machine in machine_list:
+    for machine in details["machine_list"]:
         if machine == None or machine == "" :
             return False
-    if tips == None or tips == "" or link == None or link == "" or exercise_name == None or exercise_name == "":
+    if details["tips"] == None or details["tips"] == "" or details["link"] == None or details["link"] == "" or details["exercise_name"] == None or details["exercise_name"] == "":
         print("here")
-        print(f"{tips}_{link}_{exercise_name}")
+        print(f"{details['tips']}_{details['link']}_{details['exercise_name']}")
         return False
     try:
-        intensity = int(intensity)
-        optimum = int(optimum)
-        if intensity > 3 or intensity < 0 or optimum > 3 or optimum < 0:
+        details["intensity"] = int(details["intensity"])
+        details["optimum"] = int(details["optimum"])
+        if details["intensity"] > 3 or details["intensity"] < 0 or details["optimum"] > 3 or details["optimum"] < 0:
             raise ValueError
     except ValueError as err:
         print(err)
