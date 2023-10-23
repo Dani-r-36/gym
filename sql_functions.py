@@ -1,7 +1,7 @@
 import psycopg2
 import psycopg2.extras 
 from dotenv import dotenv_values
-from sql_code import INSERT_EXERCISE_SQL, INSERT_MUSCLE_GROUP, INSERT_MUSCLE, INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE
+from sql_code import INSERT_EXERCISE_SQL, INSERT_MUSCLE_GROUP, INSERT_MUSCLE, INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE, EXISTING_EXERCISE_FROM_MUSCLE, FIND_EXERCISE_DETAILS
 from muscle_details import current_lift
 
 def get_db_connection():
@@ -68,6 +68,30 @@ def existing_exercise(exercise_name):
     if len(formatted_data) == 0:
         return False
     return formatted_data
+
+def exercise_from_muscle(muscle, group):
+    print("finding exercises")
+    params = (muscle, group,)
+    data = sql_fetch_existing(EXISTING_EXERCISE_FROM_MUSCLE,params)
+    formatted_data = [row['exercise_name'] for row in data]
+    if len(formatted_data) == 0:
+        return False
+    return formatted_data
+
+def all_exercises():
+    print("getting all exercises")
+    data = sql_fetch_existing("SELECT exercise_name FROM exercise;", None)
+    formatted_data = [row['exercise_name'] for row in data]
+    if len(formatted_data) == 0:
+        return False
+    return formatted_data
+
+def find_exercise_details(exercise):
+    print(f"finding all details for exercise {exercise}")
+    data = sql_fetch_existing(FIND_EXERCISE_DETAILS, exercise)
+    if len(data) == 0:
+        return False
+    return data
 
 def sql_execute_fetch_one(sql,params,id):
     """handles most sql executes"""
