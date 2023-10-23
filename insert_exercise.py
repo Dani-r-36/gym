@@ -5,8 +5,6 @@ from muscle_machine_names import MUSCLES
 from whatsapp_messages import WHICH_SUB, CHECK_INPUT
 
 def number_muscles():
-    i = 0
-    muscle_list = []
     message = "How many sub-muscle groups does the exercise cover?"
     send_message(WHICH_SUB)
     num = send_and_wait(message)
@@ -14,6 +12,11 @@ def number_muscles():
         send_message("Enter an integer for the number of sub-muscle groups covered") 
         num = send_and_wait(message)
     print(f"they entered {num} of sub muscles")
+    return num
+
+def sub_muscle_groups(num):
+    i = 0
+    muscle_list = []
     for i in range(int(num)):
         muscle_num = i + 1
         print(f"running sub group call {muscle_num}")

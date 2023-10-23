@@ -1,29 +1,12 @@
 from whatsapp import send_message, wait_refresh, send_and_wait
-from sql_functions import error_message, sql_insert_data, insert_new_exercise
-from exercise_details import number_muscles, get_new_exercise_details
-from sql_functions import existing_exercise
-from whatsapp_messages import INTRO
+from sql_functions import error_message, sql_insert_data, insert_new_exercise, all_exercises
+from insert_exercise import number_muscles, get_new_exercise_details, sub_muscle_groups
+from find_exercise import exercise_locate, all_lifts
+from whatsapp_messages import INTRO, MUSCLE_EXAMPLE
 
 import time
 from fuzzywuzzy import fuzz
 from selenium.webdriver.common.by import By
-
-def start_sess():
-    try:
-        print("running")
-        time.sleep(5)
-        message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
-        time.sleep(5)
-        last_message_element = message_elements[-1]
-        message_text = last_message_element.text
-        message = message_text.strip().split("\n")
-        message = message[0]
-        if message == "sess" or message == "Sess":
-            record_sess()
-    except IndexError as err :
-        print("ERROR")
-        print (err)
-        print("Couldn't find message elements in find.element in start_sess")
 
 def record_sess():
     while True:
@@ -40,12 +23,20 @@ def intro_sess():
     return returned_message
     
 def choice(user_choice):
-    # if fuzz.partial_ratio(user_choice, "Find exercises for a muscle") > 70:
-    #     find_exercise()
-    # if fuzz.partial_ratio(user_choice, "Find current lift") > 70:
-    #     find_current_list(driver)
+    if fuzz.partial_ratio(user_choice, "Find exercises for a muscle") > 70:
+        if exercise_locate() == True:
+            user_locate = send_and_wait("Would you like details for one of the exercises? Enter Y or N")
+            if user_locate in ["Yes", "Y", "yes"]:
+                all_lifts()
+    if fuzz.partial_ratio(user_choice, "Find lifts details") > 70:
+        returned_message = send_and_wait("Would you like all the exercises in the database? Enter Y or N")
+        if returned_message in ["Y", "YES", "Yes", "yes"]:
+            exercises_list = all_exercises()
+            send_message(exercises_list)
+        all_lifts()
     if fuzz.partial_ratio(user_choice, "Insert new exercise") > 70:
-        muscle_list, muscle_group = number_muscles()
+        num = number_muscles()
+        muscle_list, muscle_group = sub_muscle_groups(num)
         details, user_request = get_new_exercise_details(muscle_list, muscle_group)
         if details == False:
             return "Loop"
@@ -56,16 +47,6 @@ def choice(user_choice):
         return "End"
     return "Loop"
 
-# def find_exercise():
-#     send_message(MUSCLE_EXAMPLE)
-#     time.sleep(15)
-#     last_message_read = wait_refresh(message)
-#     print(f"they said {last_message_read}")
-#     formated_muscle, muscle_group = find_muscle_group(last_message_read)
-#     message = f"I'll look up your exercises for {formated_muscle} which is part of the {muscle_group} group"
-#     send_message(message)
-    #need to search for exercises but first need to insert them
-
 
 if __name__ == "__main__":
     return_message = ""
@@ -75,6 +56,5 @@ if __name__ == "__main__":
     print("out of it ")
     print(return_message)
     print("caught message sess")
-    # check = existing_exercise("lat pulldown with some random shit")
     record_sess()
-    # start_sess(driver)
+    # error checking for non duplicates added to dataabse do 
