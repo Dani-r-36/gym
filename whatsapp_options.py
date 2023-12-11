@@ -2,7 +2,7 @@ from whatsapp import send_message, wait_refresh, send_and_wait
 from sql_functions import error_message, sql_insert_data, insert_new_exercise, all_exercises
 from insert_exercise import number_muscles, get_new_exercise_details, sub_muscle_groups
 from find_exercise import exercise_locate, all_lifts
-from whatsapp_messages import INTRO, MUSCLE_EXAMPLE
+from whatsapp_messages import INTRO
 
 import time
 from fuzzywuzzy import fuzz
@@ -30,7 +30,7 @@ def choice(user_choice):
                 all_lifts()
     if fuzz.partial_ratio(user_choice, "Find lifts details") > 70:
         returned_message = send_and_wait("Would you like all the exercises in the database? Enter Y or N")
-        if returned_message in ["Y", "YES", "Yes", "yes"]:
+        if returned_message in ["Y", "YES", "Yes", "yes", "y"]:
             exercises_list = all_exercises()
             send_message(exercises_list)
         all_lifts()

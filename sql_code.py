@@ -13,7 +13,7 @@ WHERE muscle_group = %s;
 
 INSERT_MUSCLE = f"""
 WITH ins AS (
-    INSERT INTO muscle (muscle_name, g)
+    INSERT INTO muscle (muscle_name, group_id)
     VALUES (%s,%s)
     ON CONFLICT DO NOTHING
     RETURNING muscle_id
@@ -93,7 +93,7 @@ WHERE max_working_weight = %s
     AND max_reps = %s;
 """
 
-INSERT_EXERCISE_CURRENT_SQL = """
+INSERT_EXERCISE_CURRENT_SQL = f"""
 WITH ins AS (
     INSERT INTO exercise_details (exercise_id, current_id, intensity, tips, optimum_level, picture_video_link)
     VALUES (%s,%s,%s,%s,%s,%s)
@@ -110,16 +110,47 @@ WHERE exercise_id = %s
     AND optimum_level = %s
     AND picture_video_link = %s;
 """
+ALL_GROUP_MUSCLE = """
+SELECT * FROM group_muscle;
+"""
 
+
+
+ALL_SUB_MUSCLE = """
+SELECT * FROM muscle;
+"""
+
+ALL_MACHINE = """
+SELECT * FROM machine;
+"""
+
+GROUP_MUSCLE_ID = """
+SELECT group_id FROM group_muscle
+WHERE muscle_group = %s;
+"""
+MUSCLE_ID = """
+SELECT muscle_id, group_id FROM muscle
+WHERE muscle_name = %s;
+"""
+
+MACHINE_ID = """
+SELECT machine_id FROM machine
+WHERE machine_name = %s;
+"""
+
+EXERCISE_ID = """
+SELECT exercise_id FROM exercise
+WHERE exercise_name = %s;
+"""
 
 EXISTING_EXERCISE = """
 SELECT exercise_name
 FROM exercise
-WHERE similarity(exercise_name, %s) > 0.5;
+WHERE similarity(exercise_name, %s) > 0.6;
 """
 
 
-EXISTING_EXERCISE_FROM_MUSCLE= """
+EXISTING_EXERCISE_FROM_MUSCLE= f"""
 SELECT exercise_name FROM exercise 
 join exercise_muscle em on exercise.exercise_id = em.exercise_id
 join muscle m on em.muscle_id = m.muscle_id 
@@ -128,7 +159,7 @@ where m.muscle_name = %s
 and gm.muscle_group = %s;
 """
 
-FIND_EXERCISE_DETAILS = """
+FIND_EXERCISE_DETAILS = f"""
 SELECT
     ed.intensity,
     ed.tips,
@@ -139,5 +170,5 @@ SELECT
 FROM exercise e
 JOIN exercise_details ed ON e.exercise_id = ed.exercise_id
 JOIN current_lift cl ON ed.current_id = cl.current_id
-WHERE e.exercise_name = 'lat pull down with normal grip';
+WHERE e.exercise_name = %s;
 """

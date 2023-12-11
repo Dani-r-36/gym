@@ -1,6 +1,7 @@
 from whatsapp import send_message, wait_refresh,send_and_wait
 from insert_exercise import number_muscles,sub_muscle_groups
 from sql_functions import  exercise_from_muscle, existing_exercise, find_exercise_details
+from extract_info import get_exercise_id
 
 def exercise_locate():
     num = number_muscles()
@@ -21,8 +22,15 @@ def exercise_locate():
 def all_lifts():
     returned_message = send_and_wait("Enter exercise you wish to find")
     response = existing_exercise(returned_message)
+    print("response is ",response)
     if response != False and len(response) == 1:
-        data = find_exercise_details(response)
+        # exercise_id = get_exercise_id(response[0])
+        print(response)
+        data = find_exercise_details(response[0])
+        if data == False:
+            # called get_new_exercise_details() and pass musclelist and muscle group
+        print(data)
+        print(data[0])
         cleaned_data = {
             'intensity': int(data[0]['intensity']),
             'tips': data[0]['tips'],

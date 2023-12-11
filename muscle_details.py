@@ -1,9 +1,8 @@
 
 from fuzzywuzzy import fuzz
 from itertools import zip_longest
-from muscle_machine_names import MACHINES, MUSCLES, EXERCISE_NAME
+from muscle_machine_names import EXERCISE_NAME
 from whatsapp import send_and_wait, send_message
-from whatsapp_messages import WHICH_SUB
 
 
 def send_and_receive_exercise_details():
@@ -29,7 +28,7 @@ def send_and_receive_exercise_details():
     return details
 
 def split_machine(machine):
-    machine_list = machine.split("and")
+    machine_list = machine.split(" and ")
     stripped_machine= []
     print(f"Inside split machine {machine_list}")
     for item in machine_list:
@@ -37,14 +36,14 @@ def split_machine(machine):
     print(f"stripped machine {stripped_machine}")
     return stripped_machine
 
-def find_muscle_group(muscle_to_check): 
-    for muscle, muscle_list in MUSCLES.items():
+def find_muscle_group(muscle_to_check, muscle_dict, which_message): 
+    for muscle, muscle_list in muscle_dict.items():
         for item in muscle_list:
             if fuzz.partial_ratio(muscle_to_check.lower(), item.lower()) >=85:
                 print(f"found item {item} and muscle {muscle}")
                 return item, muscle
     send_message(f"We could not find {muscle_to_check} in our list below.")
-    send_message(WHICH_SUB)
+    send_message(which_message)
     response = send_and_wait(f"Please try to match the muscle to one in the group")
     return find_muscle_group(response)
 
@@ -67,23 +66,24 @@ def check_exercise_details(details):
         print(err)
         return False
     
-def format_machine_exercise(inputted_machine_list, inputted_exercise):
+def format_machine_exercise(inputted_machine_list, inputted_exercise, machines):
     similar_machine = []
     similar_exercise = []
     updated_machine_list = []
     updated_machine = ""
     updated_exercise = ""
     for input_machine in inputted_machine_list:
-        for machine in MACHINES:
+        for machine in machines:
             print(f"comparing machine {machine} to {input_machine.lower()} got score {fuzz.partial_ratio(machine.lower(), input_machine.lower())}")
             if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 65:
                 print(f"format, similar equipment found {machine}")
                 similar_machine.append(machine)
             if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 90:
                 print(f"format, equipment found {machine}")
-                updated_machine = machine.lower()
+                similar_machine.append(machine)
+                updated_machine = machine
                 updated_machine_list.append(updated_machine)
-        if updated_machine == "":
+        if updated_machine == "" or len(updated_machine_list)>1:
             print(f"found similar about to call redefined {similar_machine}")
             updated_machine_list.append(redefined_variables(similar_machine, "machine", input_machine))
         similar_machine = []
@@ -93,7 +93,7 @@ def format_machine_exercise(inputted_machine_list, inputted_exercise):
                 similar_exercise.append(name)
             if name.lower()== inputted_exercise.lower():
                 print("\n\nFound exact exercise")
-                updated_exercise = name.lower()
+                updated_exercise = name
 
     if updated_exercise == "":
         print("\nfinding similar exercises")
@@ -111,7 +111,7 @@ def redefined_variables(similar_list, item_type, inputted):
         message = f"""From the list of {item_type}, please send the closest {item_type} to what you entered, {inputted}.
         \n{', '.join(similar_list)}.\nIf none match, please re-enter your {item_type}"""
         updated_item = send_and_wait(message)
-    return updated_item.lower()
+    return updated_item
 
 def current_lift(exercise_name):
     message = f"Please now answer all the questions in regards to your lift for {exercise_name}"
@@ -123,3 +123,7 @@ def current_lift(exercise_name):
     reps = send_and_wait(message)
     send_message("gainsss")
     return weight, reps
+
+def num_integer(input):
+    return isinstance(input, int) or (isinstance(input, str) and input.isdigit())
+    

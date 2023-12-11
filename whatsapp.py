@@ -11,8 +11,10 @@ CONTACT_NAME = "Gym"
 
 def connect_whatsapp():
     try:
+        print("Connecting to whatsapp")
         driver = webdriver.Chrome()
         driver.get(WHATSAPP_URL)
+        print("got whatsapp URL")
         time.sleep(TIME_LOAD_BROWSER)
         wait_login(driver)
         search_box = driver.find_element(By.XPATH, '//*[contains(@class, "selectable-text copyable-text")]')
