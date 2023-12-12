@@ -26,26 +26,35 @@ def all_lifts():
     if response != False and len(response) == 1:
         # exercise_id = get_exercise_id(response[0])
         print(response)
-        data = find_exercise_details(response[0])
-        if data == False:
-            # called get_new_exercise_details() and pass musclelist and muscle group
+        data = find_exercise_details(response[0]['exercise_name'])
         print(data)
         print(data[0])
-        cleaned_data = {
+        if data[0]['max_working_weight'] == None and data[0]['max_reps'] == None:
+            cleaned_data = {
             'intensity': int(data[0]['intensity']),
             'tips': data[0]['tips'],
             'optimum_level': int(data[0]['optimum_level']),
             'link': data[0]['picture_video_link'],
-            'max_weight': float(data[0]['max_working_weight']),
-            'max_reps': data[0]['max_reps']
+            'max_weight': None,
+            'max_reps': None
         }
-        message = f"""Exercise name: {response}, intensity: {cleaned_data['intensity']}, tips: {cleaned_data['tips']}_
+        else:
+            cleaned_data = {
+                'intensity': int(data[0]['intensity']),
+                'tips': data[0]['tips'],
+                'optimum_level': int(data[0]['optimum_level']),
+                'link': data[0]['picture_video_link'],
+                'max_weight': float(data[0]['max_working_weight']),
+                'max_reps': data[0]['max_reps']
+            }
+        message = f"""Exercise name: {response[0]['exercise_name']}, intensity: {cleaned_data['intensity']}, tips: {cleaned_data['tips']}_
         _optimum level: {cleaned_data['optimum_level']}, Link: {cleaned_data['link']}, Max working weight: {cleaned_data['max_weight']}_
         _Max reps: {cleaned_data['max_reps']}"""
         send_message(message)
     if response != False and len(response) > 1:
         send_message(f"We found a list of exercises {response}, Be more specific")
         all_lifts()
-    if response == True:
+    if response == False:
         send_message(f"No exercises matched to {returned_message}, Try again")
-    
+        return None
+    return response[0]

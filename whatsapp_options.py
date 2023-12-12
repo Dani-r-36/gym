@@ -1,5 +1,5 @@
 from whatsapp import send_message, wait_refresh, send_and_wait
-from sql_functions import error_message, sql_insert_data, insert_new_exercise, all_exercises
+from sql_functions import error_message, sql_insert_data, insert_new_exercise, all_exercises, lift_edit
 from insert_exercise import number_muscles, get_new_exercise_details, sub_muscle_groups
 from find_exercise import exercise_locate, all_lifts
 from whatsapp_messages import INTRO
@@ -27,13 +27,15 @@ def choice(user_choice):
         if exercise_locate() == True:
             user_locate = send_and_wait("Would you like details for one of the exercises? Enter Y or N")
             if user_locate in ["Yes", "Y", "yes"]:
-                all_lifts()
+                exercise_request = all_lifts()
+                weight_option(exercise_request['exercise_name'], exercise_request['exercise_id'])
     if fuzz.partial_ratio(user_choice, "Find lifts details") > 70:
         returned_message = send_and_wait("Would you like all the exercises in the database? Enter Y or N")
         if returned_message in ["Y", "YES", "Yes", "yes", "y"]:
             exercises_list = all_exercises()
             send_message(exercises_list)
-        all_lifts()
+        exercise_request = all_lifts()
+        weight_option(exercise_request['exercise_name'], exercise_request['exercise_id'])
     if fuzz.partial_ratio(user_choice, "Insert new exercise") > 70:
         num = number_muscles()
         muscle_list, muscle_group = sub_muscle_groups(num)
@@ -43,10 +45,16 @@ def choice(user_choice):
         print("about to call insert")
         insert_new_exercise(details, user_request)
     if fuzz.partial_ratio(user_choice, "End session") > 70:
-        send_message("You look bigger than you think")
+        send_message("You look bigger than you think <3 ♡")
+        time.sleep(5)
         return "End"
     return "Loop"
 
+def weight_option(exercise, id):
+    returned_message = send_and_wait(f"Would you like edit the reps or weight for {exercise}? Enter Y or N")
+    if returned_message in ["Y", "YES", "Yes", "yes", "y"]:
+        lift_edit(exercise, id)
+    
 
 if __name__ == "__main__":
     return_message = ""

@@ -144,7 +144,7 @@ WHERE exercise_name = %s;
 """
 
 EXISTING_EXERCISE = """
-SELECT exercise_name
+SELECT exercise_name, exercise_id
 FROM exercise
 WHERE similarity(exercise_name, %s) > 0.6;
 """
@@ -169,6 +169,12 @@ SELECT
     cl.max_reps
 FROM exercise e
 JOIN exercise_details ed ON e.exercise_id = ed.exercise_id
-JOIN current_lift cl ON ed.current_id = cl.current_id
+LEFT JOIN current_lift cl ON ed.current_id = cl.current_id
 WHERE e.exercise_name = %s;
+"""
+
+UPDATE_CURRENT_ID = f"""
+UPDATE exercise_details
+SET current_id = %s
+WHERE exercise_id = %s;
 """

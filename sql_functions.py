@@ -1,7 +1,7 @@
 import psycopg2
 import psycopg2.extras 
 from dotenv import dotenv_values
-from sql_code import INSERT_EXERCISE_SQL,  INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE, EXISTING_EXERCISE_FROM_MUSCLE, FIND_EXERCISE_DETAILS
+from sql_code import INSERT_EXERCISE_SQL,  INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE, EXISTING_EXERCISE_FROM_MUSCLE, FIND_EXERCISE_DETAILS, UPDATE_CURRENT_ID
 from muscle_details import current_lift, num_integer
 
 def get_db_connection():
@@ -55,11 +55,24 @@ def insert_new_exercise(details, user_request):
         print (err)
         return error_message("Error in inserting data",'')
 
+def lift_edit(exercise, exercise_id):
+    weight, reps = current_lift(exercise)
+    params = (weight, reps, weight, reps)
+    current_id = sql_execute_fetch_one(INSERT_CURRENT, params, "current_id")
+    print("Inserted current lift")
+    params = (current_id,exercise_id)
+    sql_insert_data(UPDATE_CURRENT_ID, params)
+    print("Updated current_lift")
+
 def existing_exercise(exercise_name):
     print("checking if exists")
     params = (exercise_name,)
     data = sql_fetch_existing(EXISTING_EXERCISE,params)
-    formatted_data = [row['exercise_name'] for row in data]
+    print("data from existing exercise",data)
+    formatted_data = []
+    for row in data:
+        exercise = {"exercise_name":row['exercise_name'],"exercise_id":row['exercise_id']}
+        formatted_data.append(exercise)
     if len(formatted_data) == 0:
         return False
     return formatted_data
@@ -70,6 +83,7 @@ def exercise_from_muscle(muscle, group):
     print("finding exercises")
     params = (muscle, group,)
     data = sql_fetch_existing(EXISTING_EXERCISE_FROM_MUSCLE,params)
+    print(data)
     formatted_data = [row['exercise_name'] for row in data]
     if len(formatted_data) == 0:
         return False
