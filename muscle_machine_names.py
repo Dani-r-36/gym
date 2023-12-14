@@ -1,14 +1,17 @@
+"""ALL muscles, machines and exercise in DB. Can add more machines and exercises"""
+
 MUSCLES = {
     "BICEPS" : ["Outer bi", "Inner bi", "Brachialis"],
     "TRICEPS" : ["Long head", "Lateral head", "Medial head"],
     "SHOULDERS" : ["Middle delt", "Front delts", "Rear delts", "Traps"],
     "BACKS" : ["Middle lats", "Lower lats", "Upper back", "Lower back"],
     "CHESTS" : ["Upper chest", "Middle chest", "Lower chest"],
-    "LEGS" : ["Quads", "Hamstrings", "Glutes", "Calfs", "Inner adductors", 'Outer adductors']
+    "LEGS" : ["Quads", "Hamstrings", "Glutes", "Calves", "Inner adductors", 'Outer adductors']
 }
+
 MACHINES = ["Cables", "Dumbbells", "barbell", "bench", "squat rack", "Incline chest press machine", 
 "Smith machine", "chest supported free weight row machine", "Lat pull machine", "Parallel row machine", "pull-up dip station",
-"Pec fly machine", "Seated calf raise machine", "standing calf raise machine", "Leg press free weight", "Hack squat machine",
+"Pec fly machine", "Seated calves raise machine", "standing calves raise machine", "Leg press free weight", "Hack squat machine",
 "Leg press machine", "Prone leg curl machine", "Leg extension machine", "Machine preacher curl", "Inner adductor machine",
 "Outer adductor machine", "Free weight shoulder press machine"]
 
@@ -31,7 +34,7 @@ EXERCISE_NAME = {
 "Chests": ["Incline chest press machine (free weight)", "Incline chest press machine", "Smith machine Incline chest press", 
 "Smith machine chest press", "DB Chest press", "Incline DB chest press", "Pec fly"],
 
-"Legs": ["Hack squat", "Barbell RDL", "DB RDL", "Barbell Squats", "Seated Calf raise", "Standing Calf raise", "Leg press machine (free weight)",
+"Legs": ["Hack squat", "Barbell RDL", "DB RDL", "Barbell Squats", "Seated Calves raise", "Standing Calves raise", "Leg press machine (free weight)",
 "Leg press machine", "Single leg press machine (free weight)", "Single leg press machine", "Prone leg curls", "Seated leg curls", "Leg extensions",
 "Outer abductors", "Inner abductors", "Slight raised back foot split squat", "DB bulgarian split squat"]
 }

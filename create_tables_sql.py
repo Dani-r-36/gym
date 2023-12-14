@@ -15,16 +15,14 @@ create table if not exists muscle(
 
 create table if not exists exercise(
 	exercise_id INT generated always as identity,
-	exercise_machine VARCHAR(100) not null,
-	muscle_id INT not null,
-	primary key (exercise_id),
-	foreign key (muscle_id) references muscle(muscle_id)
+	exercise_name VARCHAR(200) not null,
+	primary key (exercise_id)
 );
 
 create table if not exists current_lift(
 	current_id INT generated always as identity,
-	max_working_weight VARCHAR(10) not null,
-	max_reps INT not null,
+	max_working_weight FLOAT not null,
+	max_reps VARCHAR(5) not null,
 	primary key (current_id)
 );
 
@@ -32,11 +30,30 @@ create table if not exists exercise_details(
 	exercise_details_id INT generated always as identity,
 	exercise_id INT not null,
 	current_id INT,
-	intensity VARCHAR(20) not null,
+	intensity INT not null,
 	tips VARCHAR(200) not null,
-	optimum_level VARCHAR(20) not null,
-	picture_video_link VARCHAR(50) not null,
+	optimum_level INT not null,
+	picture_video_link VARCHAR(300) not null,
 	primary key (exercise_details_id),
 	foreign key (exercise_id) references exercise(exercise_id),
 	foreign key (current_id) references current_lift(current_id)
-);"""
+);
+
+create table if not exists exercise_muscle (
+	exercise_muscle_id INT generated always as identity,
+	exercise_id INT not null,
+	muscle_id INT not null,
+	primary key (exercise_muscle_id),
+	foreign key (exercise_id) references exercise(exercise_id),
+	foreign key (muscle_id) references muscle(muscle_id)
+);
+
+create table if not exists machine(
+	machine_id INT generated always as identity,
+	exercise_machine VARCHAR(100) not null,
+	muscle_id INT not null,
+	primary key (machine_id),
+	foreign key (muscle_id) references muscle(muscle_id)
+);
+
+"""

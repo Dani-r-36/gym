@@ -10,6 +10,7 @@ TIME_LOAD_BROWSER = 10
 CONTACT_NAME = "Gym"
 
 def connect_whatsapp():
+    """Inital function, to open web whatsapp in test chrome and also find gym contact"""
     try:
         print("Connecting to whatsapp")
         driver = webdriver.Chrome()
@@ -29,6 +30,7 @@ def connect_whatsapp():
         raise Exception("Invalid URL")
     
 def wait_login(driver):
+    """Checks web whatsapp page and waits till logged in"""
     element = "Use WhatsApp on your computer"
     print(element)
     while element == "Use WhatsApp on your computer":
@@ -45,6 +47,7 @@ def wait_login(driver):
 driver = connect_whatsapp()
 
 def send_message(message):
+    """Sends message by using keys.enter and css selector"""
     try:
         input_box = driver.find_element(By.CSS_SELECTOR, "div[contenteditable='true'][data-tab='10']")
         time.sleep(2)
@@ -54,26 +57,16 @@ def send_message(message):
         print("sent: ", message)
     except AttributeError:
         raise Exception("Invalid object could be due to invalid URL")
-    
-def last_message():
-    print("read last")
-    last_message = "Do you want to..."
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
-    while last_message == "Do you want to...":
-        message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
-        # Extract the text content of the last message
-        last_message = message_elements[-1].text.strip().split("\n")[0]
-        if last_message == "Insert new exercise":
-            last_message = "What muscle?"
-    return last_message
 
 def read_last_message():
+    # returns last sent message in chat
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.message-out")))
     message_elements = driver.find_elements(By.CSS_SELECTOR, "div.message-out")
     last_message = message_elements[-1].text.strip().split("\n")[0]
     return last_message
 
 def wait_refresh():
+    """Checks if user sends message by sending break_line and checking if changes"""
     break_line = "--------"
     return_message = break_line
     print("starting refresh")
@@ -86,7 +79,8 @@ def wait_refresh():
     return return_message
 
 def send_and_wait(message):
+    """Calls to send message and then collects entered input from wait_refresh()""""
     send_message(message)
     returned_message = wait_refresh()
-    # returned_message = last_message(driver)
+    print(f"they said {returned_message}")
     return returned_message

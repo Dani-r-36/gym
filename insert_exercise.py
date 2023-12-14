@@ -5,33 +5,33 @@ from extract_info import which_sub, get_muscle_id, get_muscles, get_machines, ge
 from whatsapp_messages import CHECK_INPUT
 
 def number_muscles():
+    """Finds num of muscles to cover, making sure they entered int"""
     message = "How many sub-muscle groups does the exercise cover?"
     send_message(which_sub())
-
     num = send_and_wait(message)
     while num_integer(num) == False:
-        send_message("Enter an integer for the number of sub-muscle groups covered") 
+        message = "Enter an integer for the number of sub-muscle groups covered"
+        send_message(message) 
         num = send_and_wait(message)
     print(f"they entered {num} of sub muscles")
     return num
 
 def sub_muscle_groups(num):
+    """Returns formatted muscle and muscle group from one they entered incase of typos"""
     i = 0
     muscle_list = []
-    muscle_id = []
     muscle_dict = get_muscles()
     which_message = which_sub()
     for i in range(int(num)):
         muscle_num = i + 1
         print(f"running sub group call {muscle_num}")
         muscle = send_and_wait(f"Enter sub muscle {muscle_num}")
-        print(f"they said {muscle}")
         formated_muscle, muscle_group = find_muscle_group(muscle, muscle_dict, which_message)
         muscle_list.append(formated_muscle)
     return muscle_list, muscle_group
 
 def get_new_exercise_details(muscle_list, muscle_group):
-    machine_ids=[]
+    """Gathers exercises details via other functions and does app checks. Also checks if weights to be added"""
     details = send_and_receive_exercise_details()
     print("the muscle list putting in details is ", muscle_list)
     details["muscle_list"]= muscle_list
@@ -40,15 +40,19 @@ def get_new_exercise_details(muscle_list, muscle_group):
     details["machine_list"], details["exercise_name"] = exercise_check(details)
     if details['machine_list']== False:
         return False, False
+    
+    # Checks if user wants to add lift weights and reps
     message = """Would you also like to add your max weight and max reps for this exercise?
     \nEnter Yes if you would like to do so, and No if not"""
     user_request = send_and_wait(message)
-    print("asdfasdf about to switch ids")
+    print("about to switch ids")
+    # finds muscle and machine ids, as already in DB but needed before hand for internal checks
     details = gather_known_ids(details)
     print("switched ids")
     return details, user_request
 
 def exercise_check(details):
+    """Performs checks on exercise details (including formatting) and confirms if all correct with user"""
     if check_exercise_details(details) == False:
         send_message("Incorrect information given, please enter details again")
         get_new_exercise_details(details["muscle_list"], details["muscle_group"])
@@ -56,10 +60,13 @@ def exercise_check(details):
     check_print = CHECK_INPUT.format(details["exercise_name"],details["machine_list"],details["intensity"],details["optimum"],details["tips"],details["link"],details["muscle_list"],details["muscle_group"])
     send_message(check_print)
     print(check_print)
+
+    # Checks with user if all entered details is correct
     check = send_and_wait("Is this correct? Enter Y or N")
-    if check == "N" or check =="No":
+    if check in ["N","No","no","n"]:
         get_new_exercise_details(details["muscle_list"], details["muscle_group"])
-    #before running need to return all exercises to make sure not already there by checking table
+
+    # Before running need to return all exercises to make sure not already there by checking table
     response = existing_exercise(details["exercise_name"])
     if response != False:
         print("similar exercise in database")
@@ -68,6 +75,7 @@ def exercise_check(details):
     return details["machine_list"], details["exercise_name"]
 
 def gather_known_ids(details):
+    """Gets muscle and machine id in DB from their names"""
     muscle_id = []
     machine_ids = []
     for muscles in details['muscle_list']:

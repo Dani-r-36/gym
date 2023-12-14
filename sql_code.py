@@ -1,3 +1,5 @@
+"""SQL commands used to insert or find data"""
+
 INSERT_MUSCLE_GROUP = f"""
 WITH ins AS (
     INSERT INTO group_muscle (muscle_group)

@@ -5,6 +5,7 @@ from fuzzywuzzy import fuzz
 conn = get_db_connection()
 
 def get_muscles():
+    """Gathers muscles and group muscles from database and returns as dict"""
     group_data = sql_fetch_existing(ALL_GROUP_MUSCLE, None)
     sub_data = sql_fetch_existing(ALL_SUB_MUSCLE,None)
     muscle_dict = {}
@@ -16,15 +17,9 @@ def get_muscles():
         muscle_dict[row['muscle_group']] = sub_muscle
     return muscle_dict
 
-def find_muscle_group(muscle_to_check): 
-    muscle_dict = get_muscles()
-    for muscle, muscle_list in muscle_dict.items():
-        for item in muscle_list:
-            if fuzz.partial_ratio(muscle_to_check.lower(), item.lower()) >=85:
-                print(f"found item {item} and muscle {muscle}")
-                return item, muscle
 
 def which_sub():
+    """Gathers the muscle groups and muscles into a message"""
     muscle_dict = get_muscles()
     muscle_message = "The muscle sub groups are ->_\n"
     for key, value in muscle_dict.items() :
@@ -58,6 +53,4 @@ def get_exercise_id(exercise):
     exercise_id = data[0]['exercise_id']
     return exercise_id
 
-if __name__ =="__main__":
-    get_machine_id("Cables")
         
