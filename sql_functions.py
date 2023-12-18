@@ -1,8 +1,8 @@
 import psycopg2
 import psycopg2.extras 
 from dotenv import dotenv_values
-from sql_code import INSERT_EXERCISE_SQL,  INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE, EXISTING_EXERCISE_FROM_MUSCLE, FIND_EXERCISE_DETAILS, UPDATE_CURRENT_ID
-from muscle_details import current_lift, num_integer
+from long_text.sql_code import INSERT_EXERCISE_SQL,  INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE, EXISTING_EXERCISE_FROM_MUSCLE, FIND_EXERCISE_DETAILS, UPDATE_CURRENT_ID
+from format_details import current_lift, num_integer
 
 def get_db_connection():
     """establishes connection to database"""

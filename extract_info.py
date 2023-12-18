@@ -1,4 +1,4 @@
-from sql_code import ALL_GROUP_MUSCLE, ALL_SUB_MUSCLE, ALL_MACHINE, MACHINE_ID, MUSCLE_ID, EXERCISE_ID
+from long_text.sql_code import ALL_GROUP_MUSCLE, ALL_SUB_MUSCLE, ALL_MACHINE, MACHINE_ID, MUSCLE_ID, EXERCISE_ID
 from sql_functions import get_db_connection, sql_fetch_existing
 from fuzzywuzzy import fuzz
 

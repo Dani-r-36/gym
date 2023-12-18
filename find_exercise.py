@@ -1,12 +1,13 @@
-from whatsapp import send_message, wait_refresh,send_and_wait
-from insert_exercise import number_muscles,sub_muscle_groups
+from whatsapp_commands import send_message,send_and_wait
+from new_exercise import ExerciseDetails
 from sql_functions import  exercise_from_muscle, existing_exercise, find_exercise_details
 from extract_info import get_exercise_id
 
 def exercise_locate():
     """Gathers num of muscles and which muscles, then checks DB for those details"""
-    num = number_muscles()
-    muscle_list, muscle_group = sub_muscle_groups(num)
+    exercise_details_instance = ExerciseDetails()
+    num = exercise_details_instance.number_muscles()
+    muscle_list, muscle_group = exercise_details_instance.sub_muscle_groups(num)
     message = f"I'll look up your exercises for {muscle_list} which is part of the {muscle_group} group"
     send_message(message)
     for muscle in muscle_list:

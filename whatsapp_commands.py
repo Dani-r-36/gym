@@ -79,7 +79,7 @@ def wait_refresh():
     return return_message
 
 def send_and_wait(message):
-    """Calls to send message and then collects entered input from wait_refresh()""""
+    """Calls to send message and then collects entered input from wait_refresh()"""
     send_message(message)
     returned_message = wait_refresh()
     print(f"they said {returned_message}")

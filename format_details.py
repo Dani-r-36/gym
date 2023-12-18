@@ -1,30 +1,8 @@
 
 from fuzzywuzzy import fuzz
 from itertools import zip_longest
-from muscle_machine_names import EXERCISE_NAME
-from whatsapp import send_and_wait, send_message
-
-
-def send_and_receive_exercise_details():
-    """Gathers all the details about exercises and returns dict"""
-    message = "Please now answer all the questions in regards to the exercise"
-    send_message(message)
-    message = """What is the name of this exercise?"""
-    exercise_name = send_and_wait(message)
-    message = """Please enter the machine/equipment required\nSuch as Lat pull machine, Barbell, Seated parallel row machine, Dumbbells\n
-    If multiple equipment is needed, please separate equipment with 'and'"""
-    machine = send_and_wait(message)
-    machine_list = split_machine(machine)
-    message = "What is the intensity of the exercise?\n1 being not intense and 3 being very intense"
-    intensity = send_and_wait(message)
-    message = "What is the optimum level of the exercise?\n1 being not optimum and 3 being very optimum"
-    optimum = send_and_wait(message)
-    message = "What are some tips for the exercise?"
-    tips = send_and_wait(message)
-    message = "Please enter a link to a picture or video for the exercise"
-    link = send_and_wait(message)
-    details = {"machine_list": machine_list,"intensity": intensity,"optimum": optimum,"tips": tips,"link": link,"exercise_name": exercise_name, "muscle_list":None,"muscle_group":None}
-    return details
+from long_text.muscle_machine_names import EXERCISE_NAME
+from whatsapp_commands import send_and_wait, send_message
 
 def split_machine(machine):
     machine_list = machine.split(" and ")
@@ -79,30 +57,55 @@ def check_exercise_details(details):
         send_message("Invalid response for intensity or optimum ")
         print(err)
         return False
-    
-def format_machine_exercise(inputted_machine_list, inputted_exercise, machines):
-    """Checks machines and exercises from existing list and formats it if same, or checks if it is a similar one"""
+
+def redefined_variables(similar_list, item_type, inputted):
+    """Has list of similar exercises/machines to what user entered and checks if it is that or user giving new one"""
+    updated_item = ""
+    if len(similar_list) == 0:
+        message = f"""Nothing matched in our list of {item_type}.\nPlease re-enter {item_type} with no typos, you entered {inputted}"""
+        updated_item = send_and_wait(message)
+    else:
+        message = f"""From the list of {item_type}, please send the closest {item_type} to what you entered, {inputted}.
+        \n{', '.join(similar_list)}.\nIf none match, please re-enter your {item_type}"""
+        updated_item = send_and_wait(message)
+
+    alpha_check = updated_item.replace(" ", "")
+
+    if isinstance(alpha_check, str) and alpha_check.isalpha():
+        return updated_item
+    else:
+        send_message("Enter a valid exercise which is only string")
+        return redefined_variables(similar_list, item_type, inputted)
+
+def machine_check(inputted_machine_list, machines):
+    """checks inputted machine if in database"""
     similar_machine = []
-    similar_exercise = []
     updated_machine_list = []
     updated_machine = ""
-    updated_exercise = ""
-
-    # For machine\exercise we check if fuzz match greater than 65 then add to list and redefined to find machine\exercise, if exact match we use that
     for input_machine in inputted_machine_list:
         for machine in machines:
             print(f"comparing machine {machine} to {input_machine.lower()} got score {fuzz.partial_ratio(machine.lower(), input_machine.lower())}")
-            if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 65:
+            if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 70:
                 print(f"format, equipment found {machine}")
                 similar_machine.append(machine)
             if machine.lower() == input_machine.lower():
                 updated_machine = machine
-                
-        if updated_machine == "":
-            print(f"found similar about to call redefined {similar_machine}")
-            updated_machine_list.append(redefined_variables(similar_machine, "machine", input_machine))
-        similar_machine = []
+                updated_machine_list.append(updated_machine)
 
+        if updated_machine == "":
+            if len(similar_machine)>0:
+                print(f"found similar about to call redefined {similar_machine}")
+                updated_machine_list.append(redefined_variables(similar_machine, "machine", input_machine))
+            else:
+                updated_machine_list.append(input_machine)
+        similar_machine = []
+        updated_machine = ""
+    return updated_machine_list
+
+def exercise_check(inputted_exercise):
+    """checks if exercise is in local list"""
+    similar_exercise = []
+    updated_exercise = ""
     for exericse, exericse_list in EXERCISE_NAME.items():
         for name in exericse_list:
             if fuzz.partial_ratio(name.lower(), inputted_exercise.lower()) > 65:
@@ -112,28 +115,22 @@ def format_machine_exercise(inputted_machine_list, inputted_exercise, machines):
                 updated_exercise = name
 
     if updated_exercise == "":
-        print("\nfinding similar exercises")
-        print(f"\nsimilar exercises are {similar_exercise}")
-        updated_exercise = redefined_variables(similar_exercise, "exercise", inputted_exercise)
+        if len(similar_exercise)>0:
+            print("\nfinding similar exercises")
+            print(f"\nsimilar exercises are {similar_exercise}")
+            updated_exercise = redefined_variables(similar_exercise, "exercise", inputted_exercise)
+        else:
+            updated_exercise = inputted_exercise
+    return updated_exercise
+
+def format_machine_exercise(inputted_machine_list, inputted_exercise, machines):
+    """Checks machines and exercises from existing list and formats it if same, or checks if it is a similar one"""
+    # For machine\exercise we check if fuzz match greater than 65 then add to list and redefined to find machine\exercise, if exact match we use that
+    updated_machine_list = machine_check(inputted_machine_list, machines)
+    updated_exercise = exercise_check(inputted_exercise)
     print(updated_machine_list)
     print(updated_exercise)
     return updated_machine_list, updated_exercise
-
-def redefined_variables(similar_list, item_type, inputted):
-    """Has list of similar exercises/machines to what user entered and checks if it is that or user giving new one"""
-    if len(similar_list) == 0:
-        message = f"""Nothing matched in our list of {item_type}.\nPlease re-enter {item_type} with no typos, you entered {inputted}"""
-        updated_item = send_and_wait(message)
-    else:
-        message = f"""From the list of {item_type}, please send the closest {item_type} to what you entered, {inputted}.
-        \n{', '.join(similar_list)}.\nIf none match, please re-enter your {item_type}"""
-        updated_item = send_and_wait(message)
-    
-    if isinstance(updated_item, str) and updated_item.isalpha():
-        return updated_item
-    else:
-        send_message("Enter a valid exercise which is only string")
-        return redefined_variables(similar_list, item_type, inputted)
 
 def current_lift(exercise_name):
     """Gathers weight and reps for exercise"""
@@ -142,10 +139,10 @@ def current_lift(exercise_name):
     message = """What is the max weight you achieved? in kg"""
     weight = send_and_wait(message)
     if num_integer(weight)== False:
-        send_message("Enter valid number only")
+        send_message("Enter number only")
         return current_lift(exercise_name)
     send_message("Wooow (muscle emoji here but can't insert them")
-    message = """What is the max reps your achieved? just enter the number\n
+    message = """What is the max reps your achieved?_\n_
     F9 meaning failed 9th rep, S9 meaning scrapped 9th rep and JF9 meaning just failed 9th rep"""
     reps = send_and_wait(message)
     send_message("gainsss")
