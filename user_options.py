@@ -84,6 +84,8 @@ class GymTracker:
             lift_edit(exercise, id)
         
 
+
+
 if __name__ == "__main__":
     """Main start by waiting for user to enter sess"""
     gym_tracker = GymTracker()

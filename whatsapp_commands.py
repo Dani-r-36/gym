@@ -9,6 +9,13 @@ WHATSAPP_URL = 'https://web.whatsapp.com/'
 TIME_LOAD_BROWSER = 10
 CONTACT_NAME = "Gym"
 
+def log_function_call(func):
+    def wrapper (*args, **kwargs):
+        print(f"calling function {func.__name__} with args {args}, kwargs {kwargs}")
+        result= func(*args, **kwargs)
+        return result
+    return wrapper
+
 def connect_whatsapp():
     """Inital function, to open web whatsapp in test chrome and also find gym contact"""
     try:
@@ -78,9 +85,12 @@ def wait_refresh():
         return_message = read_last_message()
     return return_message
 
+@log_function_call
 def send_and_wait(message):
     """Calls to send message and then collects entered input from wait_refresh()"""
     send_message(message)
     returned_message = wait_refresh()
-    print(f"they said {returned_message}")
-    return returned_message
+    return returned_message.lower()
+
+def handle_error_input(reason):
+    send_message(f"Invalid input. Please try again._\n_Reason for invalid input {reason}")

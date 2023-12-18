@@ -2,7 +2,7 @@
 from fuzzywuzzy import fuzz
 from itertools import zip_longest
 from long_text.muscle_machine_names import EXERCISE_NAME
-from whatsapp_commands import send_and_wait, send_message
+from whatsapp_commands import send_and_wait, send_message, handle_error_input
 
 def split_machine(machine):
     machine_list = machine.split(" and ")
@@ -31,7 +31,7 @@ def find_muscle_group(muscle_to_check, muscle_dict, which_message):
         else:
             return exact_muscle, exact_group
     else:
-        send_message(f"We could not find {muscle_to_check} in our list below.")
+        handle_error_input(f"Muscle: {muscle_to_check} not matching to our list")
         send_message(which_message)
         response = send_and_wait(f"Please try to match the muscle to one in the group")
         return find_muscle_group(response, muscle_dict, which_message)
@@ -41,12 +41,12 @@ def check_exercise_details(details):
     """Checks machine if in DB and if other new exercises details pass basic checks"""
     for machine in details["machine_list"]:
         if machine == None or machine == "" :
-            send_message("Invalid Machine given")
+            handle_error_input("Invalid Machine given")
             return False
     if details["tips"] == None or details["tips"] == "" or details["link"] == None or details["link"] == "" or details["exercise_name"] == None or details["exercise_name"] == "":
         print("here")
         print(f"{details['tips']}_{details['link']}_{details['exercise_name']}")
-        send_message("No tips, link or exercise name given")
+        handle_error_input("No tips, link or exercise name given")
         return False
     try:
         details["intensity"] = int(details["intensity"])
@@ -54,7 +54,7 @@ def check_exercise_details(details):
         if details["intensity"] > 3 or details["intensity"] < 0 or details["optimum"] > 3 or details["optimum"] < 0:
             raise ValueError
     except ValueError as err:
-        send_message("Invalid response for intensity or optimum ")
+        handle_error_input("Invalid response for intensity or optimum ")
         print(err)
         return False
 
@@ -74,7 +74,7 @@ def redefined_variables(similar_list, item_type, inputted):
     if isinstance(alpha_check, str) and alpha_check.isalpha():
         return updated_item
     else:
-        send_message("Enter a valid exercise which is only string")
+        handle_error_input("Non-valid string entered for exercise")
         return redefined_variables(similar_list, item_type, inputted)
 
 def machine_check(inputted_machine_list, machines):
@@ -84,8 +84,9 @@ def machine_check(inputted_machine_list, machines):
     updated_machine = ""
     for input_machine in inputted_machine_list:
         for machine in machines:
-            print(f"comparing machine {machine} to {input_machine.lower()} got score {fuzz.partial_ratio(machine.lower(), input_machine.lower())}")
-            if fuzz.partial_ratio(machine.lower(), input_machine.lower()) > 70:
+            score = fuzz.partial_ratio(machine.lower(), input_machine.lower())
+            print(f"comparing machine {machine} to {input_machine.lower()} got score {score}")
+            if score > 70:
                 print(f"format, equipment found {machine}")
                 similar_machine.append(machine)
             if machine.lower() == input_machine.lower():

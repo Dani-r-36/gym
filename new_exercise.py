@@ -1,4 +1,4 @@
-from whatsapp_commands import  send_message, send_and_wait
+from whatsapp_commands import  send_message, send_and_wait, handle_error_input
 from format_details import find_muscle_group, check_exercise_details, format_machine_exercise, num_integer, split_machine
 from sql_functions import existing_exercise
 from extract_info import which_sub, get_muscle_id, get_muscles, get_machines, get_machine_id
@@ -36,8 +36,8 @@ class ExerciseDetails:
         send_message(which_sub())
         num = send_and_wait(message)
         while num_integer(num) == False:
-            message = "Enter an integer for the number of sub-muscle groups covered"
-            send_message(message) 
+            handle_error_input("Non integer entered")
+            message = "Enter an integer for sub-muscle groups covered"
             num = send_and_wait(message)
         print(f"they entered {num} of sub muscles")
         return num
@@ -95,7 +95,7 @@ class ExerciseDetails:
     def exercise_check(self,details):
         """Performs checks on exercise details (including formatting) and confirms if all correct with user"""
         if check_exercise_details(details) == False:
-            send_message("Incorrect information given, please enter details again")
+            handle_error_input("One or more information in exercise is incorrect")
             self.get_new_exercise_details(details["muscle_list"], details["muscle_group"])
         details["machine_list"], details["exercise_name"] = format_machine_exercise(details["machine_list"], details["exercise_name"], get_machines())
         check_print = CHECK_INPUT.format(details["exercise_name"],details["machine_list"],details["intensity"],details["optimum"],details["tips"],details["link"],details["muscle_list"],details["muscle_group"])
@@ -111,6 +111,6 @@ class ExerciseDetails:
         response = existing_exercise(details["exercise_name"])
         if response != False:
             print("similar exercise in database")
-            send_message(f"We found similar exercise(s) to the one you entered,\n{response}\nYou can check or add more recent lifts to this exercise by going back to main menu.") 
+            handle_error_input(f"We found similar exercise(s) to the one you entered,\n{response}") 
             return False, False
         return details["machine_list"], details["exercise_name"]
