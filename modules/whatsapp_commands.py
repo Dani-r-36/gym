@@ -61,7 +61,6 @@ def send_message(message):
         if message != "--------":
             message = f"_{message}_"
         input_box.send_keys(message + Keys.ENTER)
-        print("sent: ", message)
     except AttributeError:
         raise Exception("Invalid object could be due to invalid URL")
 

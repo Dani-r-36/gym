@@ -1,8 +1,13 @@
+import sys
+import os
+# Add the 'longtext' directory to the Python path
+
 import psycopg2
 import psycopg2.extras 
 from dotenv import dotenv_values
-from long_text.sql_code import INSERT_EXERCISE_SQL,  INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE, EXISTING_EXERCISE_FROM_MUSCLE, FIND_EXERCISE_DETAILS, UPDATE_CURRENT_ID
 from format_details import current_lift, num_integer
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'long_text'))
+from sql_code import INSERT_EXERCISE_SQL,  INSERT_MACHINE, INSERT_EXERCISE_CURRENT_SQL, INSERT_CURRENT, INSERT_EXERCISE, INSERT_EXERCISE_MUSCLE, INSERT_EXERCISE_MACHINE, EXISTING_EXERCISE, EXISTING_EXERCISE_FROM_MUSCLE, FIND_EXERCISE_DETAILS, UPDATE_CURRENT_ID
 
 def get_db_connection():
     """establishes connection to database"""

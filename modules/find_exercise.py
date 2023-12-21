@@ -1,7 +1,6 @@
 from whatsapp_commands import send_message,send_and_wait
 from new_exercise import ExerciseDetails
 from sql_functions import  exercise_from_muscle, existing_exercise, find_exercise_details
-from extract_info import get_exercise_id
 
 def exercise_locate():
     """Gathers num of muscles and which muscles, then checks DB for those details"""

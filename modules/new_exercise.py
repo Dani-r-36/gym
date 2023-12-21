@@ -2,7 +2,10 @@ from whatsapp_commands import  send_message, send_and_wait, handle_error_input
 from format_details import find_muscle_group, check_exercise_details, format_machine_exercise, num_integer, split_machine
 from sql_functions import existing_exercise
 from extract_info import which_sub, get_muscle_id, get_muscles, get_machines, get_machine_id
-from long_text.whatsapp_messages import CHECK_INPUT
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'long_text'))
+from whatsapp_messages import CHECK_INPUT
 
 
 class ExerciseDetails:

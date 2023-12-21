@@ -1,7 +1,10 @@
 
 from fuzzywuzzy import fuzz
 from itertools import zip_longest
-from long_text.muscle_machine_names import EXERCISE_NAME
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'long_text'))
+from muscle_machine_names import EXERCISE_NAME
 from whatsapp_commands import send_and_wait, send_message, handle_error_input
 
 def split_machine(machine):
