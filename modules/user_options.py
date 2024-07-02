@@ -3,6 +3,7 @@ from whatsapp_commands import send_message, send_and_wait, handle_error_input
 from sql_functions import  insert_new_exercise, all_exercises, lift_edit
 from find_exercise import exercise_locate, all_lifts
 from new_exercise import ExerciseDetails
+from api import muscle_api, split_data
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'long_text'))
@@ -64,7 +65,7 @@ class GymTracker:
         # First two option also allow user to edit weight lifted for exercise, using weight_option
 
         # Finds exercises for muscle by first checking if exercises for muscles exist, and gives details for them
-        if fuzz.partial_ratio(self.return_message, "Find exercises for a muscle") > 70:
+        if fuzz.partial_ratio(self.return_message, "Find exercises for a muscle") > 80:
             if exercise_locate() == True:
                 message = "Would you like details for one of the exercises? Enter Y or N"
                 self.return_message = send_and_wait(message)
@@ -72,7 +73,7 @@ class GymTracker:
                     return self.find_lift(all_lifts())
                 
         # Find exercises details, from using all_lifts()
-        elif fuzz.partial_ratio(self.return_message, "Find lifts details") > 70:
+        elif fuzz.partial_ratio(self.return_message, "Find lifts details") > 80:
             message = "Would you like all the exercises in the database? Enter Y or N"
             self.return_message = send_and_wait(message)
             if self.return_message.lower() in ["yes", "y"]:
@@ -81,8 +82,13 @@ class GymTracker:
             return self.find_lift(all_lifts())
 
         # Main option to insert exercise by first finding number of muscles, which muscles, then details and then inserts into DB
-        elif fuzz.partial_ratio(self.return_message, "Insert new exercise") > 70:
+        elif fuzz.partial_ratio(self.return_message, "Insert new exercise") > 80:
             return self.inserting()
+
+        elif fuzz.partial_ratio(self.return_message, "Find new exercise") > 80:
+            print("calling api")
+            returned_data = muscle_api()
+            return split_data(returned_data)
 
         # Stops the whatsapp bot and ends session
         elif fuzz.partial_ratio(self.return_message, "End session") > 70:
