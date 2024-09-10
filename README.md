@@ -29,6 +29,14 @@ This project enables you to record and retrieve gym exercises through WhatsApp, 
 - **Google Chrome**: Latest version not supported. Version 104.0 required for Selenium.
 - **ChromeDriver**: To control the Chrome browser via Selenium.
 
+## .env file
+Ensure you have the following parameters set up in your .env file
+- **DB_NAME**
+- **DB_USER**
+- **DB_PASSWORD**
+- **DB_HOST**
+- **DB_PORT**
+
 ### Limitations
 - **Browser Compatibility:** The project currently does not support the latest version of Google Chrome. Ensure you're using a version of Chrome that is compatible with the installed ChromeDriver.
 
