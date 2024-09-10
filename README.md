@@ -33,3 +33,5 @@ This project enables you to record and retrieve gym exercises through WhatsApp, 
 - **Browser Compatibility:** The project currently does not support the latest version of Google Chrome. Ensure you're using a version of Chrome that is compatible with the installed ChromeDriver.
 
 - **WhatsApp Web:** You must have WhatsApp Web open and running on your PC at all times for the bot to function correctly.
+
+For a Django-based alternative, check out [this project](https://github.com/Dani-r-36/django_gym).
