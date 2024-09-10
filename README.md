@@ -19,8 +19,6 @@ This project enables you to record and retrieve gym exercises through WhatsApp, 
 
 4. **Exercise API**: The bot can recommend new exercises by fetching data from an external API, keeping your workouts varied and interesting.
 
-## Installation and Setup
-
 ### Requirements
 
 - **Python 3.x**
