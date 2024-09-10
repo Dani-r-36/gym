@@ -15,7 +15,7 @@ This project enables you to record and retrieve gym exercises through WhatsApp, 
    
 2. **Communication with WhatsApp**: Selenium is used to control the browser and automate sending and receiving messages via WhatsApp Web. The user interacts with the bot through their phone by messaging the Gym chat.
 
-3. **Logging and Retrieving Data**: Once a message is sent (e.g., "Logged 100kg bench press, 5 reps"), the bot records the exercise into the PostgreSQL database. You can also send commands to retrieve previous workout data, like "Show last 3 bench press sessions."
+3. **Logging and Retrieving Data**: Once a message is sent about an exercise and its lift, the bot records the exercise into the PostgreSQL database. You can also send commands to retrieve previous workout data, via going through the options
 
 4. **Exercise API**: The bot can recommend new exercises by fetching data from an external API, keeping your workouts varied and interesting.
 
@@ -35,3 +35,5 @@ This project enables you to record and retrieve gym exercises through WhatsApp, 
 - **WhatsApp Web:** You must have WhatsApp Web open and running on your PC at all times for the bot to function correctly.
 
 For a Django-based alternative, check out [this project](https://github.com/Dani-r-36/django_gym).
+
+**Note** This project was designed for my own use and hasn't been updated for others to use, but are welcome to use :)
