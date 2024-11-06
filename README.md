@@ -43,5 +43,3 @@ Ensure you have the following parameters set up in your .env file
 For a Django-based alternative, check out [this project](https://github.com/Dani-r-36/django_gym).
 
 **Note** This project was designed for my own use and hasn't been updated for others to use, but are welcome to use :)
-
-test
